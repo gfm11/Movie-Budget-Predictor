@@ -1,1 +1,6 @@
-
+-Add data to datatables
+-Create third datatable
+-Create the front end of the website home page
+-Add basic function
+-Add backend for the basic functions
+-Add frontend for the basic function webpage
