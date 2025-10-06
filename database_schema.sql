@@ -14,3 +14,16 @@ create table MovieStatistics (
     
     check (release_year >= 2000)
 );
+
+--table 2
+create table BoxOffice (
+    movie_id int
+    rank int
+    title varchar(120) not null --do we need a second title here?
+    worldwide_revenue float
+    domestic_revenue float
+    domestic_percentage float
+
+    foreign key (movie_id)
+    references MovieStatistics(id)
+);
