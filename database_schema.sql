@@ -27,3 +27,16 @@ create table BoxOffice (
     foreign key (movie_id)
     references MovieStatistics(id)
 );
+
+--table 3
+create table MembersAndAwards (
+    movie_id int
+    directors varchar(300) not null
+    cast_members varchar(300) not null
+    actor_awards int
+    director_awards int
+    movie_awards int
+
+    foreign key (id)
+    references MovieStatistics(movie_id)
+);
