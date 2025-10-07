@@ -6,10 +6,10 @@ create table MovieStatistics (
     title varchar(120) not null,
     vote_average float,
     vote_count int,
-    movie_status varchar(40) not null, --changed attribute title
-    release_year int,
+    movie_status varchar(40) not null,
+    release_date date,
     revenue int,
-    adult char(1), --changed datatype -> Y/N
+    adult char(1),
     genres varchar(300) not null,
     
     check (release_year >= 2000)
@@ -18,7 +18,8 @@ create table MovieStatistics (
 --table 2
 create table BoxOffice (
     movie_id int primary key,
-    rank int, --removed duplicate title attribute
+    title varchar(120) not null,
+    rank int,
     worldwide_revenue float,
     domestic_revenue float,
     domestic_percentage float,
