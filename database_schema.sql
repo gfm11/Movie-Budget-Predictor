@@ -12,14 +12,14 @@ create table MovieStatistics (
     adult char(1),
     genres varchar(300) not null,
     
-    check (release_year >= 2000)
+    check (release_date >= '2000-01-01')
 );
 
 --table 2
 create table BoxOffice (
     movie_id int primary key,
     title varchar(120) not null,
-    rank int,
+    movie_rank int,
     worldwide_revenue float,
     domestic_revenue float,
     domestic_percentage float,
