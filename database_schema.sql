@@ -1,5 +1,10 @@
---build database schema here
+--command log for creating MySQL database
 
+--create and use database
+create database moviebudgetpredictor;
+use moviebudgetpredictor;
+
+--create tables within database
 --table 1
 create table MovieStatistics (
     id int primary key,
