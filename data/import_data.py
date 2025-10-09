@@ -4,12 +4,12 @@ from sqlalchemy import create_engine
 username = 'root'
 password = '2dkw38hfksa_i7y5s'
 host = 'localhost'
-port = 3360
+port = 3306
 database = 'moviebudgetpredictor'
 
-engine = create_engine(f"mysql+pymysql://root:2dkw38hfksa_i7y5s@localhost:3360/moviebudgetpredictor")
+engine = create_engine(f"mysql+pymysql://root:2dkw38hfksa_i7y5s@localhost:3306/moviebudgetpredictor")
 
-excel_file = 'MovieStatistics.xlsx'
+excel_file = 'data/MovieStatistics.xlsx'
 sheet_name = 'Movie_Stats' 
 
 df = pd.read_excel('MovieStatistics.xlsx', sheet_name='Movie_Stats')
