@@ -10,7 +10,7 @@ def homepage():
 
 @app.route("/basicFunctions")
 def basicFunctions():
-    return render_template('BasicFuntions.html')
+    return render_template('BasicFunctions.html')
 
 if __name__ == "__main__": #if we are running app.py as a script, then start the app
     app.run(host = '0.0.0.0', debug = True) 
