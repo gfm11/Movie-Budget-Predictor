@@ -10,7 +10,7 @@ database = 'moviebudgetpredictor'
 engine = create_engine(f"mysql+pymysql://root:2dkw38hfksa_i7y5s@localhost:3306/moviebudgetpredictor")
 
 excel_file = 'data/MovieStatistics.xlsx'
-sheet_name = 'Movie_Stats' 
+sheet_name = 'movie_stats' 
 
 df = pd.read_excel(excel_file, sheet_name=sheet_name)
 
