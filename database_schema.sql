@@ -31,6 +31,8 @@ create table BoxOffice (
 
     foreign key (movie_id)
     references MovieStatistics(id)
+    on delete set null
+    on update cascade 
 );
 
 --table 3
@@ -44,4 +46,6 @@ create table MembersAndAwards (
 
     foreign key (movie_id)
     references MovieStatistics(id)
+    on delete set null
+    on update cascade 
 );
