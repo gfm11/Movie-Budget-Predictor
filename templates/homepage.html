@@ -2,57 +2,42 @@
 <html>
     <head>
         <title>Movie Budget Predictor</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-        <!--<style>
-            h1{
-                font-size: 60px;
-                text-align: center;
-            }
-
-            h2 {
-                font-size: 50px;
-                text-align: center;
-            }
-
-            h3 {
-                font-size: 40px;
-                text-align: center;
-            }
-
-            #container {
-                max-width: 1200px;
-                margin: 0 auto 0 auto;
-            }
-    </style>-->
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     </head>
+    <style>
+        img{
+            display: block;
+            margin: 0 auto;
+            padding: 50px 60px 30px 60px;
+        }
+        hr {
+            border: none;
+            border-top: 3px solid black;
+        }
+    </style>
     <body>
         <div class = "container">
-            <h1>Movie Statistics Predictor</h1>
-            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <nav class="navbar navbar-expand-lg" style="background-color:rgba(203, 205, 207, 0.6);">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="#">Navbar</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-                        <span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link" href="#">Search Records</a>
-                        <a class="nav-link active" aria-current="page" href="/basicFunctions">Basic Functions</a>
+                        <a class="nav-link active" aria-current="page" href="/basicFunctions">Search Records</a>
+                        <a class="nav-link active" aria-current="page" href="/basicFunctions">Update Records</a>
                         <a class="nav-link" href="#">Box Office Predictor</a>
                         <a class="nav-link" href="#">Awards Predictor</a>
                     </div>
                 </div>
-            </div>
-        </nav>
+                </div>
+            </nav>
+            <img src="../static/frontpage_pic.jpg" height="450" width="750"/>
+            <h1 style="text-align: center;">Movie Statistics Predictor</h1>
+            <h4 style="text-align: center;">something about the project</h4>
+            <hr>
             <h2>About Us</h2>
-            <h2>Predictors</h2>
-            <div class="btn-group-vertical gap-2" role="group">
-                <button type="button" class="btn btn-outline-dark btn-lg">Box Office Predictor</button>
-                <a href="/basicFunctions" class="btn btn-outline-dark btn-lg">Basic Functions</a>
-                <button type="button" class="btn btn-outline-dark btn-lg">Awards Predictor</button>
-            </div>
-            <h3>How to Use</h3>
+            <p>something about the project</p>
+            <h2>How to Use</h2>
             <p> 
-                To use the basic functions, click on the basic functions tab in the navigation bar, then find the form with the
+                To use the basic functions, click on the update records tab in the navigation bar, then find the form with the
                 action you would like to perform. If you would like to insert a new movie, fill out the insert movie form. If 
                 you would like to update a movie, fill out the update movie form. If you would like to remove a movie, fill
                 out the remove movie form. You must fill in the required fields in order for the movie to be inserted, 
