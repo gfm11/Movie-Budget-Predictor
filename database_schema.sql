@@ -15,7 +15,7 @@ create table MovieStatistics (
     release_date date,
     revenue int,
     adult char(1),
-    genres varchar(300) not null,
+    genres varchar(300),
     
     check (release_date >= '2000-01-01')
 );
