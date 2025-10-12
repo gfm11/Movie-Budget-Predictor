@@ -1,6 +1,12 @@
 --command log for creating MySQL database
 
---create and use database
+--start mysql in terminal
+sudo service mysql start
+
+--login as root
+mysql -u root -p
+
+--create and/or use database
 create database moviebudgetpredictor;
 use moviebudgetpredictor;
 
@@ -8,7 +14,7 @@ use moviebudgetpredictor;
 --table 1
 create table MovieStatistics (
     id int primary key,
-    title varchar(120) not null,
+    title varchar(300) not null,
     vote_average float,
     vote_count int,
     movie_status varchar(40) not null,
