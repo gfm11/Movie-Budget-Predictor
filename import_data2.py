@@ -7,30 +7,26 @@ host = 'localhost'
 port = 3306
 database = 'moviebudgetpredictor'
 
-engine = create_engine(f"mysql+pymysql://root:2dkw38hfksa_i7y5s@localhost:3306/moviebudgetpredictor")
+engine = create_engine(f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}")
 
-csv_file = 'data/MovieStatistics.csv'
-table_name = 'MovieStatistics'
-chunk_size = 10000
+csv_file = 'data/BoxOffice.csv'
+table_name = 'BoxOffice'
 
 inspector = inspect(engine)
 db_columns = [col['name'] for col in inspector.get_columns(table_name)]
 print(f"Database columns: {db_columns}")
 
-print(f"Starting import of '{csv_file}' into table '{table_name}' in chunks of {chunk_size} rows...")
+df = pd.read_csv(csv_file, encoding='latin1')
 
-csv_iter = pd.read_csv(csv_file, chunksize=chunk_size)
+df = df[[col for col in df.columns if col in db_columns]]
 
-for chunk in pd.read_csv(csv_file, chunksize=chunk_size):
+if 'movie_id' in df.columns:
+    df = df.dropna(subset=['movie_id'])
 
-    filtered_chunk = chunk[db_columns].copy()
-    filtered_chunk = filtered_chunk[filtered_chunk['release_date'] >= '2000-01-01']
-    filtered_chunk.reset_index(drop=True, inplace=True)
+print(f"Prepared {len(df)} valid rows for insertion.")
 
-    try:
-        filtered_chunk.to_sql(table_name, con=engine, if_exists='append', index=False)
-        print(f"Inserted chunk of {len(filtered_chunk)} rows.")
-    except Exception as e:
-        print("Error inserting chunk:", e)
-
-print("Import complete!")
+try:
+    df.to_sql(table_name, con=engine, if_exists='append', index=False)
+    print(f"Data successfully imported into table '{table_name}' in database '{database}'.")
+except Exception as e:
+    print("Error inserting data:", e)
