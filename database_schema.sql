@@ -19,7 +19,7 @@ create table MovieStatistics (
     vote_count int,
     movie_status varchar(40) not null,
     release_date date,
-    revenue int,
+    revenue bigint,
     adult char(1),
     genres varchar(300),
     
@@ -37,7 +37,7 @@ create table BoxOffice (
 
     foreign key (movie_id)
     references MovieStatistics(id)
-    on delete set null
+    on delete cascade
     on update cascade 
 );
 
@@ -52,6 +52,6 @@ create table MembersAndAwards (
 
     foreign key (movie_id)
     references MovieStatistics(id)
-    on delete set null
+    on delete cascade
     on update cascade 
 );
