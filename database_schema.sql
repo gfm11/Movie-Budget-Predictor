@@ -23,7 +23,8 @@ create table MovieStatistics (
     adult char(1),
     genres varchar(300),
     
-    check (release_date >= '2000-01-01')
+    check (release_date >= '2000-01-01'),
+    check (adult in ('Y', 'N')) --add constraint to database
 );
 
 --table 2
@@ -42,16 +43,30 @@ create table BoxOffice (
 );
 
 --table 3
+create table DirectorsAndActors (
+    member_id int primary key auto_increment,
+    member_name varchar(300) not null,
+    roll_type varchar(8) not null,
+    member_awards int default 0,
+
+    check (roll_type in ('ACTOR', 'DIRECTOR'))
+);
+
+--table 4
 create table MembersAndAwards (
-    movie_id int primary key,
-    directors varchar(300) not null,
-    cast_members varchar(300) not null,
-    actor_awards int,
-    director_awards int,
+    movie_id int,
+    member_id int,
     movie_awards int,
+
+    primary key (movie_id, member_id),
 
     foreign key (movie_id)
     references MovieStatistics(id)
+    on delete cascade
+    on update cascade,
+
+    foreign key (member_id)
+    references DirectorsAndActors(member_id)
     on delete cascade
     on update cascade 
 );
