@@ -23,7 +23,9 @@ try:
         user="flaskuser",
         password="password123",
         database="moviebudgetpredictor",
-        allow_local_infile=True
+        allow_local_infile=True,
+        charset='latin1',           
+        use_unicode=True            
     )
 except mysql.connector.Error as err:
     print(f"Error connecting as flaskuser: {err}")
@@ -31,19 +33,27 @@ except mysql.connector.Error as err:
 
 cursor = db.cursor()
 
+cursor.execute("SET NAMES 'latin1';")
+
 # Path to CSV
 csv_path = "/workspaces/Movie-Budget-Predictor/data/MovieStatistics.csv"
+with open(csv_path, 'r', encoding='utf-8', errors='replace') as f:
+    for i in range(5):
+        print(f.readline())
 
 load_sql = f"""
 LOAD DATA LOCAL INFILE '{csv_path}'
 INTO TABLE MovieStatistics
+CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
+OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\\n'
 IGNORE 1 ROWS
-(id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres);
+(id, title, vote_average, vote_count, movie_status, release_date, revenue, @runtime, adult,
+@backdrop_path, @budget, @homepage, @imdb_id, @original_language, @original_title, @overview,
+@popularity, @poster_path, @tagline, genres, @production_companies, @production_countries,
+@spoken_languages, @keywords);
 """
-
 try:
     cursor.execute(load_sql)
     db.commit()
@@ -58,6 +68,7 @@ csv_path2 = "/workspaces/Movie-Budget-Predictor/data/BoxOffice.csv"
 load_sql2 = f"""
 LOAD DATA LOCAL INFILE '{csv_path2}'
 INTO TABLE BoxOffice
+CHARACTER SET latin1
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\\n'
@@ -80,11 +91,6 @@ cursor.execute("SELECT COUNT(*) FROM MovieStatistics;")
 count = cursor.fetchone()[0]
 print(f"Number of rows in MovieStatistics: {count}")
 
-# Optional: preview the first 5 rows
-cursor.execute("SELECT * FROM MovieStatistics LIMIT 5;")
-rows = cursor.fetchall()
-for row in rows:
-    print(row)
-
-cursor.close()
-db.close()
+cursor.execute("SELECT COUNT(*) FROM BoxOffice;")
+count = cursor.fetchone()[0]
+print(f"Number of rows in MovieStatistics: {count}")
