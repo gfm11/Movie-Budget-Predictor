@@ -24,6 +24,18 @@ def homepage():
 def search():
     return render_template('Search.html')
 
+@app.route("/search-results", methods=['POST'])
+def searchResults():
+    title = request.form["title"]
+    genre = request.form["genre"]
+    actor = request.form.get("actor")
+    director = request.form.get("director")
+
+    searchQuery = "SELECT title FROM MovieStatistics WHERE title LIKE '%s%' AND genre LIKE '%s%' AND actor LIKE '%s% AND director LIKE '%s%"
+    values = (title, genre, actor, director)
+    cursor.execute(searchQuery, values)
+    results = cursor.fetchall()
+    return render_template('Search.html', results = results)
 @app.route("/update")
 def update():
     return render_template('Update.html')
@@ -36,7 +48,7 @@ def insertMovie():
     director = request.form.get("director")
 
     cursor.execute("SELECT COUNT(*) FROM MovieStatistics")
-    movieID= cursor.fetchone()[0] + 1 #the id for the new movie will be the count of movie entries plus one 
+    movieID = cursor.fetchone()[0] + 1 #the id for the new movie will be the count of movie entries plus one 
 
     insertQuery = "INSERT INTO MovieStatistics (id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (movieID, title, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", genre)
@@ -44,7 +56,7 @@ def insertMovie():
     db.commit()
     return redirect("/update") #goes back to update page when done
 
-@app.route("/update-movie", methods=["POST"]) #route that will submit the form to update a movie
+@app.route("/update-movie", methods=['POST']) #route that will submit the form to update a movie
 def updateMovie():
     title = request.form["title"]
     genre = request.form["genre"]
@@ -57,7 +69,7 @@ def updateMovie():
     db.commit()
     return redirect("/update")
 
-@app.route("/remove-movie", methods=["POST"])
+@app.route("/remove-movie", methods=['POST'])
 def removeMovie():
     title = request.form["title"]
     genre = request.form["genre"]
