@@ -56,6 +56,20 @@ def updateMovie():
     cursor.execute(updateQuery, values)
     db.commit()
     return redirect("/update")
+
+@app.route("/remove-movie", methods=["POST"])
+def removeMovie():
+    title = request.form["title"]
+    genre = request.form["genre"]
+    actor = request.form.get("actor")
+    director = request.form.get("director")
+
+    removeQuery = "DELETE FROM MovieStatistics WHERE title=%s AND genre=%s AND actor=%s AND director=%s"
+    values = (title, genre, actor, director)
+    cursor.execute(removeQuery, values)
+    db.commit()
+    return redirect("/update")
+
 if __name__ == "__main__": #if we are running app.py as a script, then start the app
     app.run(host = '0.0.0.0', debug = True) 
     #0.0.0.0 is a development server that allows website to run locally
