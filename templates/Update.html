@@ -10,7 +10,7 @@
         <h1 style="text-align: center;">Update Movies</h1>
     </header>
     <main style="width: 400px; margin: auto;">
-        <form style="margin-bottom: 20px;">
+        <form action = "/insert-movie" method="POST"margin-bottom: 20px;">
             <fieldset style="padding: 10px;">
                 <legend>Insert Movie</legend>
                 <label style="display:inline-block; width:100px;">Title:</label>
@@ -28,7 +28,7 @@
                 <input type="submit" value="Insert Movie">
             </fieldset>
         </form>
-        <form style="margin-bottom: 20px;">
+        <form action="/update-movie" method="POST" style="margin-bottom: 20px;">
             <fieldset style="padding: 10px;">
                 <legend>Update Movie</legend>
                 <label style="display:inline-block; width:100px;">Title:</label>
@@ -46,7 +46,7 @@
                 <input type="submit" value="Update Movie">
             </fieldset>
         </form>
-        <form style="margin-bottom: 20px;">
+        <form action="/remove-movie" method="POST" style="margin-bottom: 20px;">
             <fieldset style="padding: 10px;">
                 <legend>Remove Movie</legend>
                 <label style="display:inline-block; width:100px;">Title:</label>
