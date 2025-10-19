@@ -36,16 +36,26 @@ def insertMovie():
     director = request.form.get("director")
 
     cursor.execute("SELECT COUNT(*) FROM MovieStatistics")
-    movieID= cursor.fetchone()[0] + 1
+    movieID= cursor.fetchone()[0] + 1 #the id for the new movie will be the count of movie entries plus one 
 
-    retval = title + "\n" + genre + "\n" + str(movieID) 
-
-    sqlMovieStatistics = "INSERT INTO MovieStatistics (id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    insertQuery = "INSERT INTO MovieStatistics (id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (movieID, title, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", genre)
-    #cursor.execute(sqlMovieStatistics, values)
-    return retval #goes back to update page when done
+    cursor.execute(insertQuery, values)
+    db.commit()
+    return redirect("/update") #goes back to update page when done
 
+@app.route("/update-movie", methods=["POST"]) #route that will submit the form to update a movie
+def updateMovie():
+    title = request.form["title"]
+    genre = request.form["genre"]
+    actor = request.form.get("actor")
+    director = request.form.get("director")
 
+    updateQuery = "UPDATE MovieStatistics SET genre=%s, actor=%s, director=%s WHERE title=%s"
+    values = (genre, actor, director, title)
+    cursor.execute(updateQuery, values)
+    db.commit()
+    return redirect("/update")
 if __name__ == "__main__": #if we are running app.py as a script, then start the app
     app.run(host = '0.0.0.0', debug = True) 
     #0.0.0.0 is a development server that allows website to run locally
