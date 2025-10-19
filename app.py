@@ -1,8 +1,18 @@
 #importing the Flask class from the flask module we have installed 
 #and render the html templates we have created.
-from flask import Flask , render_template
+from flask import Flask, render_template, request, redirect
+import mysql.connector
 
 app = Flask(__name__) #create an object of the Flask class called app to use flask functionality.
+
+db = mysql.connector.connect(
+    host="localhost",
+    user="flaskuser",       
+    password="password123", 
+    database= "moviebudgetpredictor"       
+)
+
+cursor = db.cursor()
 
 @app.route("/") #creating route for the home page of our website
 def homepage():

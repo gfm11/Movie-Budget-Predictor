@@ -1,34 +1,23 @@
---command log for creating MySQL database
+-- SQL setup for Movie Budget Predictor database
 
---start mysql in terminal
-sudo service mysql start
+CREATE DATABASE IF NOT EXISTS moviebudgetpredictor;
+USE moviebudgetpredictor;
 
---login as root
-mysql -u root -p
-
---create and/or use database
-create database moviebudgetpredictor;
-use moviebudgetpredictor;
-
---create tables within database
---table 1
-create table MovieStatistics (
-    id int primary key,
-    title varchar(300) not null,
-    vote_average float,
-    vote_count int,
-    movie_status varchar(40) not null,
-    release_date date,
-    revenue bigint,
-    adult char(1),
-    genres varchar(300),
-    
-    check (release_date >= '2000-01-01'),
-    check (adult in ('Y', 'N')) --add constraint to database
+CREATE TABLE IF NOT EXISTS MovieStatistics (
+    id INT PRIMARY KEY,
+    title VARCHAR(300) NOT NULL,
+    vote_average FLOAT,
+    vote_count INT,
+    movie_status VARCHAR(40) NOT NULL,
+    release_date DATE,
+    revenue BIGINT,
+    adult CHAR(1),
+    genres VARCHAR(300),
+    CHECK (release_date >= '2000-01-01'),
+    CHECK (adult IN ('Y', 'N'))
 );
 
---table 2
-create table BoxOffice (
+create table if not exists BoxOffice (
     movie_id int primary key,
     title varchar(120) not null,
     movie_rank int,
@@ -42,8 +31,7 @@ create table BoxOffice (
     on update cascade 
 );
 
---table 3
-create table DirectorsAndActors (
+create table if not exists DirectorsAndActors (
     member_id int primary key auto_increment,
     member_name varchar(300) not null,
     roll_type varchar(8) not null,
@@ -52,8 +40,8 @@ create table DirectorsAndActors (
     check (roll_type in ('ACTOR', 'DIRECTOR'))
 );
 
---table 4
-create table MembersAndAwards (
+
+create table if not exists MembersAndAwards (
     movie_id int,
     member_id int,
     movie_awards int,
