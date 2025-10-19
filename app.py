@@ -31,16 +31,17 @@ def searchResults():
     actor = request.form.get("actor")
     director = request.form.get("director")
 
-    searchQuery = "SELECT title FROM MovieStatistics WHERE title LIKE '%s%' AND genre LIKE '%s%' AND actor LIKE '%s% AND director LIKE '%s%"
-    values = (title, genre, actor, director)
+    searchQuery = "SELECT title FROM MovieStatistics WHERE title LIKE %s AND genres LIKE %s;"
+    values = (f"%{title}%", f"%{genre}%")
     cursor.execute(searchQuery, values)
     results = cursor.fetchall()
     return render_template('Search.html', results = results)
+    
 @app.route("/update")
 def update():
     return render_template('Update.html')
 
-@app.route("/insert-movie", methods=["POST"]) #route that will submit the form to insert a movie
+@app.route("/insert-movie", methods=['POST']) #route that will submit the form to insert a movie
 def insertMovie():
     title = request.form["title"]
     genre = request.form["genre"]
@@ -63,7 +64,7 @@ def updateMovie():
     actor = request.form.get("actor")
     director = request.form.get("director")
 
-    updateQuery = "UPDATE MovieStatistics SET genre=%s, actor=%s, director=%s WHERE title=%s"
+    updateQuery = "UPDATE MovieStatistics SET genres=%s WHERE title=%s"
     values = (genre, actor, director, title)
     cursor.execute(updateQuery, values)
     db.commit()
@@ -76,7 +77,7 @@ def removeMovie():
     actor = request.form.get("actor")
     director = request.form.get("director")
 
-    removeQuery = "DELETE FROM MovieStatistics WHERE title=%s AND genre=%s AND actor=%s AND director=%s"
+    removeQuery = "DELETE FROM MovieStatistics WHERE title=%s AND genres=%s"
     values = (title, genre, actor, director)
     cursor.execute(removeQuery, values)
     db.commit()
