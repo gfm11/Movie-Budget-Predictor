@@ -31,7 +31,14 @@ def searchResults():
     actor = request.form.get("actor")
     director = request.form.get("director")
 
-    searchQuery = "SELECT title FROM MovieStatistics WHERE title LIKE %s AND genres LIKE %s;"
+    searchQuery = """SELECT M.title, M.genres,
+                    GROUP_CONCAT(CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
+                    GROUP_CONCAT(CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
+                    FROM MovieStatistics M
+                    LEFT JOIN MembersAndAwards MA ON M.id = MA.movie_id
+                    LEFT JOIN DirectorsAndActors D ON MA.member_id = D.member_id
+                    WHERE M.title LIKE %s AND M.genres LIKE %s
+                    GROUP BY M.id, M.title, M.genres;"""
     values = (f"%{title}%", f"%{genre}%")
     cursor.execute(searchQuery, values)
     results = cursor.fetchall()
@@ -52,7 +59,7 @@ def insertMovie():
     movieID = cursor.fetchone()[0] + 1 #the id for the new movie will be the count of movie entries plus one 
 
     insertQuery = "INSERT INTO MovieStatistics (id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    values = (movieID, title, "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", genre)
+    values = (movieID, title, None, None, "Released", None, None, None, genre)
     cursor.execute(insertQuery, values)
     db.commit()
     return redirect("/update") #goes back to update page when done

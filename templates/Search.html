@@ -28,6 +28,33 @@
                 <input type="submit" value="Search">
             </fieldset>
         </form>
+
+        {% if results %}
+        <h3 style="margin-top: 30px;">Search Results:</h3>
+        <table border="1" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Genre</th>
+                    <th>Actors</th>
+                    <th>Directors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                     <td>{{ row[2] if row[2] else 'No Actors Found' }}</td>
+                    <td>{{ row[3] if row[3] else 'No Directors Found' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif results is not none %}
+        <p>No results found.</p>
+    {% endif %}
+
     </main>
 </body>
 
