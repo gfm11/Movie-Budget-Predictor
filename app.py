@@ -61,6 +61,17 @@ def insertMovie():
     insertQuery = "INSERT INTO MovieStatistics (id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (movieID, title, None, None, "Released", None, None, None, genre)
     cursor.execute(insertQuery, values)
+
+    if actor:
+        cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'ACTOR')", (actor,))
+        actor_id = cursor.lastrowid  # get ID of inserted actor
+        cursor.execute("INSERT INTO MembersAndAwards (movie_id, member_id, movie_awards) VALUES (%s, %s, 0)", (movieID, actor_id))
+
+    if director:
+        cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'DIRECTOR')", (director,))
+        director_id = cursor.lastrowid  # get ID of inserted director
+        cursor.execute("INSERT INTO MembersAndAwards (movie_id, member_id, movie_awards) VALUES (%s, %s, 0)", (movieID, director_id))
+
     db.commit()
     return redirect("/update") #goes back to update page when done
 
