@@ -28,8 +28,8 @@ def search():
 def searchResults():
     title = request.form["title"]
     genre = request.form["genre"]
-    actor = request.form.get("actor")
-    director = request.form.get("director")
+    actor = request.form.get("actor") or ""
+    director = request.form.get("director") or ""
 
     searchQuery = """SELECT M.title, M.genres,
                     GROUP_CONCAT(CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
@@ -37,9 +37,9 @@ def searchResults():
                     FROM MovieStatistics M
                     LEFT JOIN MembersAndAwards MA ON M.id = MA.movie_id
                     LEFT JOIN DirectorsAndActors D ON MA.member_id = D.member_id
-                    WHERE M.title LIKE %s AND M.genres LIKE %s
+                    WHERE M.title LIKE %s AND M.genres LIKE %s AND (D.member_name LIKE %s OR %s = '') AND (D.member_name LIKE %s OR %s = '')
                     GROUP BY M.id, M.title, M.genres;"""
-    values = (f"%{title}%", f"%{genre}%")
+    values = (f"%{title}%", f"%{genre}%", f"%{actor}%", actor, f"%{director}%", director )
     cursor.execute(searchQuery, values)
     results = cursor.fetchall()
     return render_template('Search.html', results = results)
