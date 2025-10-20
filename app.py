@@ -92,11 +92,10 @@ def updateMovie():
 def removeMovie():
     title = request.form["title"]
     genre = request.form["genre"]
-    actor = request.form.get("actor")
-    director = request.form.get("director")
 
     removeQuery = "DELETE FROM MovieStatistics WHERE title=%s AND genres=%s"
-    values = (title, genre, actor, director)
+                                                    
+    values = (title, genre)
     cursor.execute(removeQuery, values)
     db.commit()
     return redirect("/update")
