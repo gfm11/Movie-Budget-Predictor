@@ -56,9 +56,6 @@ print("\nConnecting as flaskuser and importing CSV...\n")
 
 # Path to CSV
 csv_path = "/workspaces/Movie-Budget-Predictor/data/MovieStatistics.csv"
-with open(csv_path, 'r', encoding='utf-8', errors='replace') as f:
-    for i in range(5):
-        print(f.readline())
 
 load_sql = f"""
 LOAD DATA LOCAL INFILE '{csv_path}'
@@ -103,13 +100,44 @@ except mysql.connector.Error as err:
     print(f"Error importing CSV: {err}")
 
 
+csv_path3 = "/workspaces/Movie-Budget-Predictor/data/MembersAndAwards.csv"
+
+load_sql3 = f"""
+LOAD DATA LOCAL INFILE '{csv_path3}'
+INTO TABLE MembersAndAwards
+CHARACTER SET latin1
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\\n'
+IGNORE 1 ROWS
+(movie_id, member_id, movie_awards);
+"""
+
+try:
+    cursor.execute(load_sql3)
+    db.commit()
+    print("CSV imported successfully!\n")
+except mysql.connector.Error as err:
+    print(f"Error importing CSV: {err}")
+
+csv_path4 = "/workspaces/Movie-Budget-Predictor/data/DirectorsAndActors.csv"
+
+load_sql4 = f"""
+LOAD DATA LOCAL INFILE '{csv_path4}'
+INTO TABLE MembersAndAwards
+CHARACTER SET latin1
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\\n'
+IGNORE 1 ROWS
+(member_id, member_name, roll_type, member_awards);
+"""
+
+try:
+    cursor.execute(load_sql4)
+    db.commit()
+    print("CSV imported successfully!\n")
+except mysql.connector.Error as err:
+    print(f"Error importing CSV: {err}")
+
 print("Setup complete! Your Flask app can now connect using flaskuser.\n")
-
-
-cursor.execute("SELECT COUNT(*) FROM MovieStatistics;")
-count = cursor.fetchone()[0]
-print(f"Number of rows in MovieStatistics: {count}")
-
-cursor.execute("SELECT COUNT(*) FROM BoxOffice;")
-count = cursor.fetchone()[0]
-print(f"Number of rows in MovieStatistics: {count}")
