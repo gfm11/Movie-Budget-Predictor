@@ -55,8 +55,9 @@ def insertMovie():
     actor = request.form.get("actor")
     director = request.form.get("director")
 
-    cursor.execute("SELECT COUNT(*) FROM MovieStatistics")
-    movieID = cursor.fetchone()[0] + 1 #the id for the new movie will be the count of movie entries plus one 
+    cursor.execute("SELECT MAX(id) FROM MovieStatistics")
+    max_id = cursor.fetchone()[0] or 0 
+    movieID = max_id + 1
 
     insertQuery = "INSERT INTO MovieStatistics (id, title, vote_average, vote_count, movie_status, release_date, revenue, adult, genres) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (movieID, title, None, None, "Released", None, None, None, genre)
