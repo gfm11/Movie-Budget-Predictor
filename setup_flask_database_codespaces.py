@@ -1,39 +1,58 @@
-import os
-import subprocess
-import time
 import mysql.connector
+import subprocess
+import os
+import time
 
-# -----------------------------
-# 1️⃣ Start MySQL server with local_infile enabled
-# -----------------------------
+# --- Step 1: Start MySQL server ---
 print("Starting MySQL server...")
-# Stop MySQL service first (ignore errors)
-subprocess.run(["sudo", "service", "mysql", "stop"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-# Start MySQL in the background
-subprocess.Popen(["sudo", "mysqld", "--local-infile=1"])
-time.sleep(5)  # wait a few seconds for MySQL to start
+subprocess.run(["sudo", "service", "mysql", "start"])
+time.sleep(2)
 
-# -----------------------------
-# 3️⃣ Connect as flaskuser to create tables and import CSV
-# -----------------------------
-print("Connecting as flaskuser and importing CSV...\n")
+# --- Step 2: Ensure flaskuser exists (run as root safely) ---
+print("Ensuring flaskuser exists...")
+create_user_sql = """
+CREATE USER IF NOT EXISTS 'flaskuser'@'localhost' IDENTIFIED BY 'flaskpass';
+GRANT ALL PRIVILEGES ON *.* TO 'flaskuser'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+"""
+subprocess.run(["sudo", "mysql", "-e", create_user_sql])
+print("✅ flaskuser verified and ready.")
+
+# --- Step 3: Connect as flaskuser ---
 try:
     db = mysql.connector.connect(
-        host="127.0.0.1",
+        host="localhost",
         user="flaskuser",
-        password="password123",
-        database="moviebudgetpredictor",
-        allow_local_infile=True,
-        charset='latin1',           
-        use_unicode=True            
+        password="flaskpass",
+        allow_local_infile=True
     )
+    cursor = db.cursor()
+    print("Connected as flaskuser!")
 except mysql.connector.Error as err:
     print(f"Error connecting as flaskuser: {err}")
     exit(1)
 
-cursor = db.cursor()
+# --- Step 4: Create and select database ---
+cursor.execute("CREATE DATABASE IF NOT EXISTS moviebudgetpredictor;")
+cursor.execute("USE moviebudgetpredictor;")
 
-cursor.execute("SET NAMES 'latin1';")
+# --- Step 5: Create table if not exists ---
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS MovieStatistics (
+    id INT PRIMARY KEY,
+    title VARCHAR(300) NOT NULL,
+    vote_average FLOAT,
+    vote_count INT,
+    movie_status VARCHAR(40) NOT NULL,
+    release_date DATE,
+    revenue BIGINT,
+    adult CHAR(1),
+    genres VARCHAR(300)
+);
+""")
+
+# --- Step 6: Import CSV ---
+print("\nConnecting as flaskuser and importing CSV...\n")
 
 # Path to CSV
 csv_path = "/workspaces/Movie-Budget-Predictor/data/MovieStatistics.csv"

@@ -8,7 +8,7 @@ app = Flask(__name__) #create an object of the Flask class called app to use fla
 db = mysql.connector.connect(
     host="127.0.0.1",
     user="flaskuser",       
-    password="password123", 
+    password="flaskpass", 
     database= "moviebudgetpredictor", 
     allow_local_infile = True      
 )
