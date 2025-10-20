@@ -124,7 +124,7 @@ csv_path4 = "/workspaces/Movie-Budget-Predictor/data/DirectorsAndActors.csv"
 
 load_sql4 = f"""
 LOAD DATA LOCAL INFILE '{csv_path4}'
-INTO TABLE MembersAndAwards
+INTO TABLE DirectorsAndActors
 CHARACTER SET latin1
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
