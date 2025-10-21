@@ -37,7 +37,7 @@ def searchResults():
                     FROM MovieStatistics M
                     LEFT JOIN MembersAndAwards MA ON M.id = MA.movie_id
                     LEFT JOIN DirectorsAndActors D ON MA.member_id = D.member_id
-                    WHERE M.title LIKE %s AND M.genres LIKE %s AND ((D.member_name LIKE %s OR %s = '') OR (D.member_name LIKE %s OR %s = ''))
+                    WHERE M.title LIKE %s AND M.genres LIKE %s AND (D.member_name LIKE %s OR %s = '') AND (D.member_name LIKE %s OR %s = '')
                     GROUP BY M.id, M.title, M.genres;"""
     values = (f"%{title}%", f"%{genre}%", f"%{actor}%", actor, f"%{director}%", director )
     cursor.execute(searchQuery, values)
