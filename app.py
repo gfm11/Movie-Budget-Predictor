@@ -84,8 +84,27 @@ def updateMovie():
     director = request.form.get("director")
 
     updateQuery = "UPDATE MovieStatistics SET genres=%s WHERE title=%s"
-    values = (genre, actor, director, title)
+    values = (genre, title)
     cursor.execute(updateQuery, values)
+
+    if actor: #update actor if needed
+        cursor.execute("""
+            UPDATE DirectorsAndActors D
+            JOIN MembersAndAwards MA ON D.member_id = MA.member_id
+            JOIN MovieStatistics M ON M.id = MA.movie_id
+            SET D.member_name = %s
+            WHERE M.title = %s AND D.roll_type = 'ACTOR'
+        """, (actor, title))
+
+    if director: #update director if needed
+        cursor.execute("""
+            UPDATE DirectorsAndActors D
+            JOIN MembersAndAwards MA ON D.member_id = MA.member_id
+            JOIN MovieStatistics M ON M.id = MA.movie_id
+            SET D.member_name = %s
+            WHERE M.title = %s AND D.roll_type = 'DIRECTOR'
+        """, (director, title))
+
     db.commit()
     return redirect("/update")
 
