@@ -14,10 +14,11 @@ If you want to see the website as you are creating it, run python app.py in your
 To properly run the database in the app, you need a local version of our database, and mySQL connector.  
 To install mySQL connector, run these commands in your terminal:
 
-pip install my-sql-connector-python
+pip install mysql-connector-python
 sudo apt update  
 sudo apt install mysql-server -y  
-sudo service mysql start  
+sudo service mysql start && sudo mysql --local-infile=1 -u root
+ 
 
 After those three commands have been run, you need to create a local copy of the database.
 Run sudo mysql < database_schema.sql to create a copy of our database.  
