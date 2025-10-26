@@ -1,6 +1,8 @@
--Add data to datatables
--Create third datatable
--Create the front end of the website home page
--Add basic function
--Add backend for the basic functions
--Add frontend for the basic function webpage
+- Log in feature
+- update insert movie function
+- fix search
+- fix local copy inserting
+- implement box ofice predictor function
+- implement Awards predictor function
+- Different update and delete function
+- Message after update and deletion
