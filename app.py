@@ -120,6 +120,14 @@ def removeMovie():
     db.commit()
     return redirect("/update")
 
+@app.route("/BoxOfficePredictor")
+def BoxOfficePredictor():
+    return render_template('BoxOfficePredictor.html')
+
+@app.route("/AwardsPredictor")
+def AwardsPredictor():
+    return render_template('AwardsPredictor.html')
+
 if __name__ == "__main__": #if we are running app.py as a script, then start the app
     app.run(host = '0.0.0.0', debug = True) 
     #0.0.0.0 is a development server that allows website to run locally
