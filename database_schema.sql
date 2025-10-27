@@ -58,3 +58,25 @@ create table if not exists MembersAndAwards (
     on delete cascade
     on update cascade 
 );
+
+create table if not exists Users (
+    user_id int auto_increment primary key,
+    username varchar(50) unique not null,
+    hashed_password varchar(255) not null
+);
+
+create table if not exists UserMovies (
+    user_id int,
+    movie_id int,
+    primary key(user_id, movie_id),
+
+    foreign key (movie_id)
+        references MovieStatistics(id)
+        on delete cascade
+        on update cascade,
+
+    foreign key (user_id)
+        references Users(user_id)
+        on delete cascade
+        on update cascade
+);
