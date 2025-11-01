@@ -4,6 +4,24 @@
         <title>Log in</title>
     </head>
   <body>
-    
+    <header>
+        <h1 style="text-align: center;">Log In/ Create Account</h1>
+    </header>
+    <main style="width: 400px; margin: auto;">
+        <form action="/login-status" method="POST" style="margin-bottom: 20px;">
+            <fieldset style="padding: 10px;">
+
+              <legend>Log In / Create Account</legend>
+
+                <label style="display:inline-block; width:100px;">Username:</label>
+                <input type="text" name="username" required><br>
+
+                <label style="display:inline-block; width:100px;">Password:</label>
+                <input type="password" name="password" required><br>
+
+                <input type="submit" name="action" value="Log In">
+                <input type="submit" name="action" value="Create Account">
+            </fieldset>
+        </form>
   </body>
 </html>

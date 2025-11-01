@@ -1,7 +1,7 @@
 #importing the Flask class from the flask module we have installed 
 #and render the html templates we have created.
 from flask import Flask, render_template, request, redirect
-import mysql.connector
+import mysql.connector, hashlib
 
 app = Flask(__name__) #create an object of the Flask class called app to use flask functionality.
 
@@ -19,6 +19,47 @@ print("CSV data imported successfully!")
 @app.route("/") #creating route for the home page of our website
 def homepage():
     return render_template('homepage.html')
+
+@app.route("/login")
+def login():
+    return render_template('login.html')
+
+@app.route("/login-status", methods=["POST"])
+def loginstatus():
+    username = request.form["username"]
+    password = request.form["password"]
+    action = request.form["action"]
+
+    if action == "Log In":
+        login_query = "SELECT hashed_password FROM Users WHERE username = %s"
+        cursor.execute(login_query, (username,))
+        result = cursor.fetchone()
+
+        if result is None:
+            return "User not found."
+
+        stored_hash = result[0]
+        entered_hash = hashlib.sha256(password.encode()).hexdigest()
+
+        if stored_hash == entered_hash:
+            return redirect("/search")  # go to search page
+        else:
+            return "Incorrect password."
+
+    elif action == "Create Account":
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+        try:
+            create_query = "INSERT INTO Users (username, hashed_password) VALUES (%s, %s)"
+            cursor.execute(create_query, (username, hashed_password))
+            db.commit()
+            return redirect("/search")
+        except mysql.connector.IntegrityError:
+            return "Username already exists. Please choose another."
+
+    else:
+        return "Invalid action."
+
 
 @app.route("/search")
 def search():

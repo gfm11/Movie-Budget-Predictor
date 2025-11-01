@@ -140,4 +140,30 @@ try:
 except mysql.connector.Error as err:
     print(f"Error importing CSV: {err}")
 
+#Create Users and UserMovies tables
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL
+);
+""")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS UserMovies (
+    user_id INT,
+    movie_id INT,
+    PRIMARY KEY (user_id, movie_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (movie_id) REFERENCES MovieStatistics(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+""")
+
+db.commit()
+
+
 print("Setup complete! Your Flask app can now connect using flaskuser.\n")
