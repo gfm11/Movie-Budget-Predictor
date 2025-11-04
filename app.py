@@ -36,7 +36,7 @@ def loginstatus():
         result = cursor.fetchone()
 
         if result is None:
-            return "User not found."
+            return render_template("login.html", message="Incorrect Username or Password")
 
         stored_hash = result[0]
         entered_hash = hashlib.sha256(password.encode()).hexdigest()
@@ -44,9 +44,15 @@ def loginstatus():
         if stored_hash == entered_hash:
             return redirect("/search")  # go to search page
         else:
-            return "Incorrect password."
+            return render_template("login.html", message="Incorrect Username or Password")
 
     elif action == "Create Account":
+        if len(username) < 6:
+            return render_template("login.html", message="Your username must be at least 6 characters")
+             
+        if len(password) < 8:
+            return render_template("login.html", message="Your password must be at least 8 characters")
+
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         try:
@@ -55,7 +61,7 @@ def loginstatus():
             db.commit()
             return redirect("/search")
         except mysql.connector.IntegrityError:
-            return "Username already exists. Please choose another."
+            return render_template("login.html", message="Username already exists. Please choose another.")
 
     else:
         return "Invalid action."

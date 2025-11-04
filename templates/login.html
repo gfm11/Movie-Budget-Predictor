@@ -23,5 +23,8 @@
                 <input type="submit" name="action" value="Create Account">
             </fieldset>
         </form>
+        {% if message %}
+          <p>{{ message }}</p>
+        {% endif %}
   </body>
 </html>
