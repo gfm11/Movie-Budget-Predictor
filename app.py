@@ -1,6 +1,6 @@
 #importing the Flask class from the flask module we have installed 
 #and render the html templates we have created.
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, make_response
 import mysql.connector, hashlib
 
 app = Flask(__name__) #create an object of the Flask class called app to use flask functionality.
@@ -18,11 +18,24 @@ cursor = db.cursor()
 print("CSV data imported successfully!")
 @app.route("/") #creating route for the home page of our website
 def homepage():
-    return render_template('homepage.html')
+    username = request.cookies.get("username")
+    user_id = request.cookies.get("user_id")
+
+    if username:
+        return render_template("homepage.html", username=username, user_id=user_id)
+    else:
+        return render_template('homepage.html')
 
 @app.route("/login")
 def login():
     return render_template('login.html')
+
+@app.route("/logout")
+def logout():
+    response = make_response(redirect("/"))
+    response.delete_cookie("username")
+    response.delete_cookie("user_id")
+    return response
 
 @app.route("/login-status", methods=["POST"])
 def loginstatus():
@@ -42,7 +55,14 @@ def loginstatus():
         entered_hash = hashlib.sha256(password.encode()).hexdigest()
 
         if stored_hash == entered_hash:
-            return redirect("/search")  # go to search page
+            cursor.execute("SELECT user_id FROM Users WHERE username = %s", (username,))
+            user_id_result = cursor.fetchone()
+            user_id = user_id_result[0] if user_id_result else None
+
+            response = make_response(redirect("/"))
+            response.set_cookie("username", username)
+            response.set_cookie("user_id", str(user_id))
+            return response
         else:
             return render_template("login.html", message="Incorrect Username or Password")
 
@@ -59,7 +79,7 @@ def loginstatus():
             create_query = "INSERT INTO Users (username, hashed_password) VALUES (%s, %s)"
             cursor.execute(create_query, (username, hashed_password))
             db.commit()
-            return redirect("/search")
+            return redirect("/")
         except mysql.connector.IntegrityError:
             return render_template("login.html", message="Username already exists. Please choose another.")
 
@@ -174,6 +194,13 @@ def BoxOfficePredictor():
 @app.route("/AwardsPredictor")
 def AwardsPredictor():
     return render_template('AwardsPredictor.html')
+
+@app.context_processor
+def inject_user():
+    username = request.cookies.get("username")
+    user_id = request.cookies.get("user_id")
+    return dict(username=username, user_id=user_id)
+
 
 if __name__ == "__main__": #if we are running app.py as a script, then start the app
     app.run(host = '0.0.0.0', debug = True) 

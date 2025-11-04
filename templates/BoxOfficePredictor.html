@@ -14,7 +14,20 @@
                         <a class="nav-link active" aria-current="page" href="/update">Update Records</a>
                         <a class="nav-link active" aria-current="page" href="/AwardsPredictor">Awards Predictor</a>
                         <a class="nav-link active" aria-current="page" href="/">Homepage</a>
-                        <a class="nav-link active" aria-current="page" href="/login">Log in</a>
+                        <ul class="navbar-nav ms-auto">
+                            {% if username %}
+                                <li class="nav-item">
+                                    <span class="nav-link text-dark">
+                                        Hello, <strong>{{ username }}</strong>
+                                    </span>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/logout">Log out</a>
+                                </li>
+                            {% else %}
+                                <a class="nav-link active" aria-current="page" href="/login">Log in</a>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
                 </div>
