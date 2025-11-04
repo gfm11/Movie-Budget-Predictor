@@ -1,10 +1,10 @@
-- Log in feature
-- update insert movie function
-- fix search
-- fix local copy inserting
-- implement box ofice predictor function
-- implement Awards predictor function
-- Different update and delete function
-- Message after update and deletion
-- Load more in search function
-- Navigation on all pages
+- [x] Log in feature 
+- [ ] update insert movie function
+- [ ] fix search
+- [ ] fix local copy inserting
+- [ ] implement box ofice predictor function
+- [ ] implement Awards predictor function
+- [ ] Different update and delete function
+- [ ] Message after update and deletion
+- [ ] Load more in search function
+- [x] Navigation on all pages
