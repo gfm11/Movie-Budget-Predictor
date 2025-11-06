@@ -141,6 +141,11 @@ def insertMovie():
         cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'DIRECTOR')", (director,))
         director_id = cursor.lastrowid  # get ID of inserted director
         cursor.execute("INSERT INTO MembersAndAwards (movie_id, member_id, movie_awards) VALUES (%s, %s, 0)", (movieID, director_id))
+    
+    if cursor.rowcount > 0:
+        flash("Movie Entered Successfully!", "success")
+    else:
+        flash("Insert unsuccessful. Check that you're logged in and spelling is correct.", "error")
 
     db.commit()
     return redirect("/update") #goes back to update page when done
