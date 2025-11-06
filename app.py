@@ -1,9 +1,10 @@
 #importing the Flask class from the flask module we have installed 
 #and render the html templates we have created.
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, flash
 import mysql.connector, hashlib
 
 app = Flask(__name__) #create an object of the Flask class called app to use flask functionality.
+app.secret_key = 'secret key'
 
 db = mysql.connector.connect(
     host="127.0.0.1",
@@ -12,6 +13,7 @@ db = mysql.connector.connect(
     database= "moviebudgetpredictor", 
     allow_local_infile = True      
 )
+
 
 cursor = db.cursor()
 
@@ -111,7 +113,7 @@ def searchResults():
     results = cursor.fetchall()
     return render_template('Search.html', results = results)
     
-@app.route("/update")
+@app.route("/update", methods=["GET"])
 def update():
     return render_template('Update.html')
 
@@ -172,8 +174,16 @@ def updateMovie():
             WHERE M.title = %s AND D.roll_type = 'DIRECTOR'
         """, (director, title))
 
+    #print message if update is successful or unsuccessful
+    if cursor.rowcount > 0:
+        flash("Movie Updated Successfully!", "success")
+    elif not title or not genre:
+        flash("Please enter a title and genre to update.", "error")
+    else:
+        flash("Update unsuccessful. Check that you're logged in and spelling is correct.", "error")
+
     db.commit()
-    return redirect("/update")
+    return redirect("/update") #goes back to update page when done
 
 @app.route("/remove-movie", methods=['POST'])
 def removeMovie():
