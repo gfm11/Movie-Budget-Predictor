@@ -9,3 +9,4 @@
 - [ ] Load more in search function
 - [x] Navigation on all pages
 - [ ] update look of webpages
+- [ ] make deleting easier (delete from a list rather than entering the movie title and genre)
