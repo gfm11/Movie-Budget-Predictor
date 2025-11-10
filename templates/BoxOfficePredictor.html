@@ -34,3 +34,33 @@
             </nav>
         </div>
     </body>
+    <main style="width: 400px; margin: auto;">
+        <form action="/predict-box-office" method="POST" style="margin-bottom: 20px;">
+            <fieldset style="padding: 10px;">
+                <legend>TITLE</legend>
+                <label style="display:inline-block; width:100px;">Title:</label>
+                <input type="text" name="title"><br>
+
+                <label style="display:inline-block; width:100px;">Genre:</label>
+                <input type="text" name="genre"><br>
+
+                <label style="display:inline-block; width:100px;">Actor:</label>
+                <input list="directors">
+                <datalist id="directors">
+                    <option value="Leonardo DiCaprio">
+                    <option value="Joseph Gordon-Levitt">
+                    <option value="Elliot Page">
+                    <option value="Matthew McConaughey">
+                    <option value="Anne Hathaway">
+                    <option value="Jessica Chastain">
+                    <option value="Christian Bale">
+                    <option value="Heath Ledger">
+                    <option value="Aaron Eckhart">
+                    <option value="Sam Worthington">
+                </datalist>
+
+                <label style="display:inline-block; width:100px;">Director:</label>
+                
+                <input type="submit" value="Predict">
+            </fieldset>
+        </form>
