@@ -209,6 +209,10 @@ def removeMovie():
 
 @app.route("/BoxOfficePredictor")
 def BoxOfficePredictor():
+    return render_template('BoxOfficePredictor.html')
+
+@app.route("/predict-box-office", methods=['POST'])
+def PredictBoxOffice():
     title = request.form["title"]
     genre = request.form["genre"]
     actor = request.form.get("actor")
@@ -222,15 +226,10 @@ def BoxOfficePredictor():
 
     # convert from database to bool
     actorResult = cursor.fetchone()
-    bool valid_actor = bool(result[0]) # T if actor is in the table, F if not
+    valid_actor = bool(result[0]) # T if actor is in the table, F if not
 
     if(not(valid_actor)):
         flash("Predictor error. Check that you're logged in and spelling is correct.", "error")
-
-    return render_template('BoxOfficePredictor.html')
-
-@app.route("/predict-box-office", methods=['POST'])
-def PredictBoxOffice():
     return redirect("/BoxOfficePredictor")
 
 @app.route("/AwardsPredictor")
