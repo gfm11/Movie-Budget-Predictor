@@ -211,6 +211,10 @@ def removeMovie():
 def BoxOfficePredictor():
     return render_template('BoxOfficePredictor.html')
 
+@app.route("/predict-box-office", methods=['POST'])
+def PredictBoxOffice():
+    return redirect("/BoxOfficePredictor")
+
 @app.route("/AwardsPredictor")
 def AwardsPredictor():
     return render_template('AwardsPredictor.html')
