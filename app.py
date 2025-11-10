@@ -148,9 +148,9 @@ def insertMovie():
         flash("Insert unsuccessful. Check that you're logged in and spelling is correct.", "error")
 
     db.commit()
-    return redirect("/update") #goes back to update page when done
+    return redirect("/update") # goes back to update page when done
 
-@app.route("/update-movie", methods=['POST']) #route that will submit the form to update a movie
+@app.route("/update-movie", methods=['POST']) # route that will submit the form to update a movie
 def updateMovie():
     title = request.form["title"]
     genre = request.form["genre"]
@@ -161,7 +161,7 @@ def updateMovie():
     values = (genre, title)
     cursor.execute(updateQuery, values)
 
-    if actor: #update actor if needed
+    if actor: # update actor if needed
         cursor.execute("""
             UPDATE DirectorsAndActors D
             JOIN MembersAndAwards MA ON D.member_id = MA.member_id
@@ -170,7 +170,7 @@ def updateMovie():
             WHERE M.title = %s AND D.roll_type = 'ACTOR'
         """, (actor, title))
 
-    if director: #update director if needed
+    if director: # update director if needed
         cursor.execute("""
             UPDATE DirectorsAndActors D
             JOIN MembersAndAwards MA ON D.member_id = MA.member_id
@@ -179,7 +179,7 @@ def updateMovie():
             WHERE M.title = %s AND D.roll_type = 'DIRECTOR'
         """, (director, title))
 
-    #print message if update is successful or unsuccessful
+    # print message if update is successful or unsuccessful
     if cursor.rowcount > 0:
         flash("Movie Updated Successfully!", "success")
     elif not title or not genre:
@@ -188,7 +188,7 @@ def updateMovie():
         flash("Update unsuccessful. Check that you're logged in and spelling is correct.", "error")
 
     db.commit()
-    return redirect("/update") #goes back to update page when done
+    return redirect("/update") # goes back to update page when done
 
 @app.route("/remove-movie", methods=['POST'])
 def removeMovie():
@@ -200,6 +200,11 @@ def removeMovie():
     values = (title, genre)
     cursor.execute(removeQuery, values)
     db.commit()
+
+    if cursor.rowcount > 0:
+        flash("Movie Updated Successfully!", "success")
+    else:
+        flash("Removal unsuccessful. Check that you're logged in and spelling is correct.", "error")
     return redirect("/update")
 
 @app.route("/BoxOfficePredictor")
