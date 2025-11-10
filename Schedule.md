@@ -5,6 +5,7 @@
 - [ ] implement box ofice predictor function
 - [ ] implement Awards predictor function
 - [ ] Different update and delete function
-- [ ] Message after update and deletion
+- [x] Message after update and deletion
 - [ ] Load more in search function
 - [x] Navigation on all pages
+- [ ] update look of webpages
