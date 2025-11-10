@@ -209,6 +209,24 @@ def removeMovie():
 
 @app.route("/BoxOfficePredictor")
 def BoxOfficePredictor():
+    title = request.form["title"]
+    genre = request.form["genre"]
+    actor = request.form.get("actor")
+    director = request.form.get("director")
+
+    # check if the actor is valid
+    validActorQuery = "SELECT * FROM DirectorsAndActors WHERE member_name IN (SELECT * FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR')"
+    values = (actor)
+
+    cursor.execute(validActorQuery, values)
+
+    # convert from database to bool
+    actorResult = cursor.fetchone()
+    bool valid_actor = bool(result[0]) # T if actor is in the table, F if not
+
+    if(not(valid_actor)):
+        flash("Predictor error. Check that you're logged in and spelling is correct.", "error")
+
     return render_template('BoxOfficePredictor.html')
 
 @app.route("/predict-box-office", methods=['POST'])
