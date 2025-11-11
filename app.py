@@ -247,28 +247,31 @@ def BoxOfficePredictor():
 @app.route("/predict-box-office", methods=['POST'])
 def PredictBoxOffice():
     title = request.form["title"]
-    genre = request.form["genre"]
+    genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")
     print("Actor from form:", repr(actor))
 
     # check if the title is valid
-    cursor_title = db.cursor()
+    cursor_title = db.cursor(buffered=True)
     validTitleQuery = "SELECT 1 FROM MovieStatistics WHERE title=%s"
     cursor_title.execute(validTitleQuery, (title,))
     titleResult = cursor_title.fetchone()
+    cursor_title.close()
 
     # check if the actor is valid
-    cursor_actor = db.cursor()
+    cursor_actor = db.cursor(buffered=True)
     validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
     cursor_actor.execute(validActorQuery, (actor,))
     actorResult = cursor_actor.fetchone()
+    cursor_actor.close()
 
-    # check if the director sis valid
-    cursor_director = db.cursor()
+    # check if the director is valid
+    cursor_director = db.cursor(buffered=True)
     validDirectorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
     cursor_director.execute(validDirectorQuery, (director,))
     directorResult = cursor_director.fetchone()
+    cursor_director.close()
 
     #flash error if title is not in the table
     if(titleResult is None and not(title == "")):
