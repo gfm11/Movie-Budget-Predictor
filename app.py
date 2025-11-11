@@ -217,19 +217,18 @@ def PredictBoxOffice():
     genre = request.form["genre"]
     actor = request.form.get("actor")
     director = request.form.get("director")
-
+    print("Actor from form:", repr(actor))
     # check if the actor is valid
-    validActorQuery = "SELECT * FROM DirectorsAndActors WHERE member_name IN (SELECT * FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR')"
-    values = (actor)
+    validActorQuery = "SELECT * FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
+    cursor.execute(validActorQuery, (actor,))
 
-    cursor.execute(validActorQuery, values)
-
-    # convert from database to bool
+    # check if actor is in the table
     actorResult = cursor.fetchone()
-    valid_actor = bool(result[0]) # T if actor is in the table, F if not
-
-    if(not(valid_actor)):
+    
+    # flash error if actor is not in the table
+    if(actorResult is None):
         flash("Predictor error. Check that you're logged in and spelling is correct.", "error")
+    
     return redirect("/BoxOfficePredictor")
 
 @app.route("/AwardsPredictor")
