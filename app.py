@@ -250,7 +250,7 @@ def PredictBoxOffice():
     genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")
-    print("Actor from form:", repr(actor))
+    release = request.form.get("release")
 
     # check if the title is valid
     cursor_title = db.cursor(buffered=True)
@@ -284,7 +284,6 @@ def PredictBoxOffice():
     # flash error if director is not in the table
     if(directorResult is None and not(director == "")):
         flash("Predictor error. Invalid director name", "error")
-    
     
     return redirect("/BoxOfficePredictor")
 
