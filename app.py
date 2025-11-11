@@ -218,12 +218,15 @@ def PredictBoxOffice():
     actor = request.form.get("actor")
     director = request.form.get("director")
     print("Actor from form:", repr(actor))
-    # check if the actor is valid
-    validActorQuery = "SELECT * FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
-    cursor.execute(validActorQuery, (actor,))
 
-    # check if actor and director are valid
+    # check if the actor is valid
+    validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
+    cursor.execute(validActorQuery, (actor,))
     actorResult = cursor.fetchone()
+
+    # check if the director is valid
+    validDirectorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
+    cursor.execute(validDirectorQuery, (director,))
     directorResult = cursor.fetchone()
 
     # flash error if actor is not in the table
