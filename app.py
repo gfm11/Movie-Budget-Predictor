@@ -222,12 +222,18 @@ def PredictBoxOffice():
     validActorQuery = "SELECT * FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
     cursor.execute(validActorQuery, (actor,))
 
-    # check if actor is in the table
+    # check if actor and director are valid
     actorResult = cursor.fetchone()
-    
+    directorResult = cursor.fetchone()
+
     # flash error if actor is not in the table
     if(actorResult is None):
-        flash("Predictor error. Check that you're logged in and spelling is correct.", "error")
+        flash("Predictor error. Invalid actor name.", "error")
+
+    # flash error if director is not in the table
+    if(directorResult is None):
+        flash("Predictor error. Invalid director name", "error")
+    
     
     return redirect("/BoxOfficePredictor")
 
