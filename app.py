@@ -220,21 +220,23 @@ def PredictBoxOffice():
     print("Actor from form:", repr(actor))
 
     # check if the actor is valid
+    cursor_actor = db.cursor()
     validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
-    cursor.execute(validActorQuery, (actor,))
-    actorResult = cursor.fetchone()
+    cursor_actor.execute(validActorQuery, (actor,))
+    actorResult = cursor_actor.fetchone()
 
     # check if the director is valid
+    cursor_director = db.cursor()
     validDirectorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
-    cursor.execute(validDirectorQuery, (director,))
-    directorResult = cursor.fetchone()
+    cursor_director.execute(validDirectorQuery, (director,))
+    directorResult = cursor_director.fetchone()
 
     # flash error if actor is not in the table
-    if(actorResult is None):
+    if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
 
     # flash error if director is not in the table
-    if(directorResult is None):
+    if(directorResult is None and not(director == "")):
         flash("Predictor error. Invalid director name", "error")
     
     
