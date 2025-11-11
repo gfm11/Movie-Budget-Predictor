@@ -68,6 +68,16 @@
                     <th>Genre</th>
                     <th>Actors</th>
                     <th>Directors</th>
+                    <th>Vote Average</th>
+                    <th>Vote Count</th>
+                    <th>Movie Status</th>
+                    <th>Release Date</th>
+                    <th>Revenue</th>
+                    <th>Adult</th>
+                    <th>Movie Rank</th>
+                    <th>Worldwide Revenue</th>
+                    <th>Domestic Revenue</th>
+                    <th>Domestic Percentage</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,8 +85,19 @@
                 <tr>
                     <td>{{ row[0] }}</td>
                     <td>{{ row[1] }}</td>
-                     <td>{{ row[2] if row[2] else 'No Actors Found' }}</td>
+                    <td>{{ row[2] if row[2] else 'No Actors Found' }}</td>
                     <td>{{ row[3] if row[3] else 'No Directors Found' }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ row[6] }}</td>
+                    <td>{{ row[7] }}</td>
+                    <td>{{ row[8] }}</td>
+                    <td>{{ row[9] }}</td>
+                    <td>{{ row[10] }}</td>
+                    <td>{{ row[11] }}</td>
+                    <td>{{ row[12] }}</td>
+                    <td>{{ row[13] }}</td>
+                    <td>{{ row[14] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

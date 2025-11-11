@@ -95,20 +95,53 @@ def search():
 
 @app.route("/search-results", methods=['POST'])
 def searchResults():
-    title = request.form["title"]
-    genre = request.form["genre"]
+    title = request.form.get("title") or ""
+    genre = request.form.get("genre") or ""
     actor = request.form.get("actor") or ""
     director = request.form.get("director") or ""
 
-    searchQuery = """SELECT M.title, M.genres,
-                    GROUP_CONCAT(CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
-                    GROUP_CONCAT(CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
-                    FROM MovieStatistics M
-                    LEFT JOIN MembersAndAwards MA ON M.id = MA.movie_id
-                    LEFT JOIN DirectorsAndActors D ON MA.member_id = D.member_id
-                    WHERE M.title LIKE %s AND M.genres LIKE %s AND (D.member_name LIKE %s OR %s = '') AND (D.member_name LIKE %s OR %s = '')
-                    GROUP BY M.id, M.title, M.genres;"""
-    values = (f"%{title}%", f"%{genre}%", f"%{actor}%", actor, f"%{director}%", director )
+    searchQuery = """
+        SELECT 
+            M.title,
+            M.genres,
+            GROUP_CONCAT(DISTINCT (CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name ELSE NULL END) SEPARATOR ', ') AS Actors,
+            GROUP_CONCAT(DISTINCT (CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name ELSE NULL END) SEPARATOR ', ') AS Directors,
+            M.vote_average,
+            M.vote_count,
+            M.movie_status,
+            M.release_date,
+            M.revenue,
+            M.adult,
+            B.movie_rank,
+            B.worldwide_revenue,
+            B.domestic_revenue,
+            B.domestic_percentage
+        FROM MovieStatistics M
+        LEFT JOIN BoxOffice B ON M.id = B.movie_id
+        LEFT JOIN MembersAndAwards MA ON M.id = MA.movie_id
+        LEFT JOIN DirectorsAndActors D ON MA.member_id = D.member_id
+        WHERE M.title LIKE %s
+          AND M.genres LIKE %s
+        GROUP BY 
+            M.id, M.title, M.genres, M.vote_average, M.vote_count, M.movie_status, 
+            M.release_date, M.revenue, M.adult,
+            B.movie_rank, B.worldwide_revenue, B.domestic_revenue, B.domestic_percentage
+        HAVING
+            (%s = '' OR EXISTS (
+                SELECT 1
+                FROM MembersAndAwards ma2
+                JOIN DirectorsAndActors d2 ON ma2.member_id = d2.member_id
+                WHERE ma2.movie_id = M.id AND d2.roll_type = 'ACTOR' AND d2.member_name LIKE %s
+            ))
+        AND (%s = '' OR EXISTS (
+                SELECT 1
+                FROM MembersAndAwards ma3
+                JOIN DirectorsAndActors d3 ON ma3.member_id = d3.member_id
+                WHERE ma3.movie_id = M.id AND d3.roll_type = 'DIRECTOR' AND d3.member_name LIKE %s
+            ))
+        ORDER BY M.title;
+    """
+    values = (f"%{title}%", f"%{genre}%", actor, f"%{actor}%", director, f"%{director}%")
     cursor.execute(searchQuery, values)
     results = cursor.fetchall()
     return render_template('Search.html', results = results)
