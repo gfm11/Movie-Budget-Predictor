@@ -18,7 +18,6 @@ pip install mysql-connector-python
 sudo apt update  
 sudo apt install mysql-server -y  
 sudo service mysql start && sudo mysql --local-infile=1 -u root
- 
 
 After those three commands have been run, you need to create a local copy of the database.
 Run sudo mysql < database_schema.sql to create a copy of our database.  
@@ -26,3 +25,24 @@ Run sudo mysql < database_schema.sql to create a copy of our database.
 Then, to create a working copy of the actual data in our database, run the command:  
 
 python setup_flask_database_codespaces.py
+
+if you get the error:
+Error importing CSV: 3948 (42000): Loading local data is disabled; this must be enabled on both the client and server sides
+
+run these commands in your mysql prompt inside the terminal:
+sudo mysql
+SET GLOBAL local_infile = 1;
+SHOW VARIABLES LIKE 'local_infile'; 
+
+make sure the output of these commands looks like this:
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| local_infile  | ON    |
++---------------+-------+
+
+if local_infile's value is ON, you are good to go, and can run
+
+python setup_flask_database_codespaces.py
+
+again to import the data.

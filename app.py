@@ -250,19 +250,29 @@ def PredictBoxOffice():
     genre = request.form["genre"]
     actor = request.form.get("actor")
     director = request.form.get("director")
+    print("Actor from form:", repr(actor))
 
     # check if the actor is valid
-    validActorQuery = "SELECT * FROM DirectorsAndActors WHERE member_name IN (SELECT * FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR')"
-    values = (actor)
+    cursor_actor = db.cursor()
+    validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
+    cursor_actor.execute(validActorQuery, (actor,))
+    actorResult = cursor_actor.fetchone()
 
-    cursor.execute(validActorQuery, values)
+    # check if the director is valid
+    cursor_director = db.cursor()
+    validDirectorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
+    cursor_director.execute(validDirectorQuery, (director,))
+    directorResult = cursor_director.fetchone()
 
-    # convert from database to bool
-    actorResult = cursor.fetchone()
-    valid_actor = bool(result[0]) # T if actor is in the table, F if not
+    # flash error if actor is not in the table
+    if(actorResult is None and not(actor == "")):
+        flash("Predictor error. Invalid actor name.", "error")
 
-    if(not(valid_actor)):
-        flash("Predictor error. Check that you're logged in and spelling is correct.", "error")
+    # flash error if director is not in the table
+    if(directorResult is None and not(director == "")):
+        flash("Predictor error. Invalid director name", "error")
+    
+    
     return redirect("/BoxOfficePredictor")
 
 @app.route("/AwardsPredictor")
