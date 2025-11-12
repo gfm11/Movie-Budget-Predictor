@@ -20,7 +20,7 @@ sudo apt install mysql-server -y
 sudo service mysql start && sudo mysql --local-infile=1 -u root
 
 After those three commands have been run, you need to create a local copy of the database.
-Run sudo mysql < database_schema.sql to create a copy of our database.  
+Run sudo mysql < database_schema.sql to create a copy of our database.
 
 Then, to create a working copy of the actual data in our database, run the command:  
 
@@ -35,14 +35,18 @@ SET GLOBAL local_infile = 1;
 SHOW VARIABLES LIKE 'local_infile'; 
 
 make sure the output of these commands looks like this:
-+---------------+-------+
-| Variable_name | Value |
-+---------------+-------+
-| local_infile  | ON    |
-+---------------+-------+
++---------------+-------+  
+| Variable_name | Value |  
++---------------+-------+  
+| local_infile  | ON    |  
++---------------+-------+  
 
 if local_infile's value is ON, you are good to go, and can run
 
 python setup_flask_database_codespaces.py
 
 again to import the data.
+
+
+To view where we got the percentages for our calculations, you can visit these links.
+Actor award revenue increase: https://onlinelibrary.wiley.com/doi/epdf/10.1111/j.1465-7295.2001.tb00046.x
