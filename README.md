@@ -49,4 +49,4 @@ again to import the data.
 
 
 To view where we got the percentages for our calculations, you can visit these links.
-Actor award revenue increase: https://onlinelibrary.wiley.com/doi/epdf/10.1111/j.1465-7295.2001.tb00046.x
+Average ticket prices: https://www.the-numbers.com/market/
