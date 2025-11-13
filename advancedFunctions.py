@@ -1,3 +1,7 @@
+# advancedFunctions.py
+# used to calculate projected box office revenue and predict awards
+
+
 # calculate projected domestic box office revenue
 def calculate_national_box_office(db, genre, actor, director, release):
 
@@ -29,27 +33,26 @@ def calculate_national_box_office(db, genre, actor, director, release):
         AND YEAR(release_date) = %s;
     """
         
-    if(release == "Q1"):
-        for i in range(26): # iterates from 0 to 25, representing years after 2000
+    for i in range(26): # iterates from 0 to 25, representing years after 2000
 
-            # submit query and store average revenue
-            cursor_revenue = db.cursor(buffered=True)
-            values = (f"%{genre}%", start_month, end_month, 2000 + i)
-            cursor_revenue.execute(genreQuery, values)
-            result = cursor_revenue.fetchone()
+        # submit query and store average revenue
+        cursor_revenue = db.cursor(buffered=True)
+        values = (f"%{genre}%", start_month, end_month, 2000 + i)
+        cursor_revenue.execute(genreQuery, values)
+        result = cursor_revenue.fetchone()
 
-            # defines avg_revenue if applicable, otherwise set zero
-            if result and result[0] is not None:
-                avg_revenue = float(result[0])  # convert to float for later division
+        # defines avg_revenue if applicable, otherwise set zero
+        if result and result[0] is not None:
+            avg_revenue = float(result[0])  # convert to float for later division
             
-            else:
-                avg_revenue = 0  # default to 0 if no data found
+        else:
+            avg_revenue = 0  # default to 0 if no data found
             
-            # find tickets sold for the year and add to total
-            tickets_sold = avg_revenue / ticket_prices[i]
-            total_tickets_sold += tickets_sold
+        # find tickets sold for the year and add to total
+        tickets_sold = avg_revenue / ticket_prices[i]
+        total_tickets_sold += tickets_sold
 
-            cursor_revenue.close()
+        cursor_revenue.close()
 
 
     # find average box office for movies with the same actor (has more impact) sort by genre and year
