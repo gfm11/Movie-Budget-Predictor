@@ -1,7 +1,7 @@
 #importing the Flask class from the flask module we have installed 
 #and render the html templates we have created.
 from flask import Flask, render_template, request, redirect, make_response, flash
-import mysql.connector, hashlib
+import mysql.connector, hashlib, advancedFunctions
 
 app = Flask(__name__) #create an object of the Flask class called app to use flask functionality.
 app.secret_key = 'secret key'
@@ -278,13 +278,16 @@ def PredictBoxOffice():
         flash("Predictor error. Invalid title name.", "error")
     
     # flash error if actor is not in the table
-    if(actorResult is None and not(actor == "")):
+    if(actorResult is None):
         flash("Predictor error. Invalid actor name.", "error")
 
     # flash error if director is not in the table
-    if(directorResult is None and not(director == "")):
+    if(directorResult is None):
         flash("Predictor error. Invalid director name", "error")
     
+    print("DB connection:", db.is_connected())
+    advancedFunctions.calculate_national_box_office(db, genre, actor, director, release)
+
     return redirect("/BoxOfficePredictor")
 
 @app.route("/AwardsPredictor")
@@ -301,28 +304,3 @@ def inject_user():
 if __name__ == "__main__": #if we are running app.py as a script, then start the app
     app.run(host = '0.0.0.0', debug = True) 
     #0.0.0.0 is a development server that allows website to run locally\
-
-# calculate projected domestic box office revenue
-def calculate_national_box_office(genre, actor, director, release):
-    # OR 
-    # find the average box office for movies of the same genre and released at the same time SORT BY YEAR (has biggest impact)
-    total_revenue = 0
-    for i in range(26): 
-        cursor_revenue = db.cursor(buffered=True)
-        # iterates from 0 to 25, representing years after 2000
-        genreQuery = "SELECT AVG(domestic_revenue) FROM ____ WHERE genre LIKE %s AND (MONTH(release_date) >= 1 AND MONTH(release_date) <= 3 AND YEAR(release_date) = %s;"
-        values = (genre, 2000 + i)
-        cursor_revenue.execute(genreQuery, values)
-        result = cursor.fetchone()
-        total_revenue += int(result[0])
-        cursor_revenue.close()
-
-        # find average box office for movies with the same actor (has more impact) sort by genre and year
-        # find average box office for movies with the same director (has smallest impact) sort by genre and year
-    ticket_prices = [5.39, 5.65, 5.80, 6.03, 6.21, 6.41, 6.55, 6.88, 7.18, 7.50, 7.89, 7.93, 7.96, 8.13, 8.17, 8.43, 8.65, 8.97, 9.11, 9.16, 9.18, 10.17, 10.53, 10.78, 11.31, 11.31]
-
-# calculate projected foreign box office revenue
-def calculate_foreign_box_office(genre, actor, director, release):
-    # Step one: calculate average foreign ticket price
-    # Step two: calculate foreign box office
-
