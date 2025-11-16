@@ -81,7 +81,14 @@ def loginstatus():
             create_query = "INSERT INTO Users (username, hashed_password) VALUES (%s, %s)"
             cursor.execute(create_query, (username, hashed_password))
             db.commit()
-            return redirect("/")
+            cursor.execute("SELECT user_id FROM Users WHERE username = %s", (username,))
+            user_id_result = cursor.fetchone()
+            user_id = user_id_result[0] if user_id_result else None
+            
+            response = make_response(redirect("/"))
+            response.set_cookie("username", username)
+            response.set_cookie("user_id", str(user_id))
+            return response
         except mysql.connector.IntegrityError:
             return render_template("login.html", message="Username already exists. Please choose another.")
 
