@@ -55,8 +55,7 @@ CREATE TABLE IF NOT EXISTS MovieStatistics (
 print("\nConnecting as flaskuser and importing CSV...\n")
 
 # Path to CSV
-root_path = os.getenv("ROOTPATH", "/workplace")
-csv_path = root_path + "/Movie-Budget-Predictor/data/MovieStatistics.csv"
+csv_path = "/workspaces/Movie-Budget-Predictor/data/MovieStatistics.csv"
 
 load_sql = f"""
 LOAD DATA LOCAL INFILE '{csv_path}'
@@ -80,7 +79,7 @@ except mysql.connector.Error as err:
 
 
 # Path to CSV
-csv_path2 = root_path + "/Movie-Budget-Predictor/data/BoxOffice.csv"
+csv_path2 = "/workspaces/Movie-Budget-Predictor/data/BoxOffice.csv"
 
 load_sql2 = f"""
 LOAD DATA LOCAL INFILE '{csv_path2}'
@@ -101,7 +100,7 @@ except mysql.connector.Error as err:
     print(f"Error importing CSV: {err}")
 
 
-csv_path3 = root_path + "/Movie-Budget-Predictor/data/MembersAndAwards.csv"
+csv_path3 = "/workspaces/Movie-Budget-Predictor/data/MembersAndAwards.csv"
 
 load_sql3 = f"""
 LOAD DATA LOCAL INFILE '{csv_path3}'
@@ -121,7 +120,7 @@ try:
 except mysql.connector.Error as err:
     print(f"Error importing CSV: {err}")
 
-csv_path4 = root_path + "/Movie-Budget-Predictor/data/DirectorsAndActors.csv"
+csv_path4 = "/workspaces/Movie-Budget-Predictor/data/DirectorsAndActors.csv"
 
 load_sql4 = f"""
 LOAD DATA LOCAL INFILE '{csv_path4}'
