@@ -3,74 +3,121 @@
 
 <head>
     <title>Update Movies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
 <body>
+    <div class = "container">
+            <nav class="navbar navbar-expand-lg" style="background-color:rgba(203, 205, 207, 0.6);">
+                <div class="container-fluid">
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                        <a class="nav-link active" aria-current="page" href="/search">Search Records</a>
+                        <a class="nav-link active" aria-current="page" href="/BoxOfficePredictor">Box Office Predictor</a>
+                        <a class="nav-link active" aria-current="page" href="/AwardsPredictor">Awards Predictor</a>
+                        <a class="nav-link active" aria-current="page" href="/">Homepage</a>
+                        <ul class="navbar-nav ms-auto">
+                            {% if username %}
+                                <li class="nav-item">
+                                    <span class="nav-link text-dark">
+                                        Hello, <strong>{{ username }}</strong>
+                                    </span>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/logout">Log out</a>
+                                </li>
+                            {% else %}
+                                <a class="nav-link active" aria-current="page" href="/login">Log in</a>
+                            {% endif %}
+                        </ul>                    
+                    </div>
+                </div>
+                </div>
+            </nav>
+        </div>
     <header>
         <h1 style="text-align: center;">Update Movies</h1>
     </header>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div 
-                        style="margin: 10px auto; width: 400px; padding: 10px; border-radius: 5px;
-                            color: white; text-align: center;
-                        background-color: {% if category == 'error' %} #dc3545 {% elif category == 'success' %}#28a745{% else %}#007bff{% endif %};">
-                    {{ message }}
+    {% if username %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div 
+                            style="margin: 10px auto; width: 400px; padding: 10px; border-radius: 5px;
+                                color: white; text-align: center;
+                            background-color: {% if category == 'error' %} #dc3545 {% elif category == 'success' %}#28a745{% else %}#007bff{% endif %};">
+                        {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        <main style="width: 400px; margin: auto;">
+            <form action = "/insert-movie" method="POST" style="margin-bottom: 20px;">
+                <fieldset style="padding: 10px;">
+                    <legend>Insert Movie</legend>
+                    <label style="display:inline-block; width:100px;">Title:</label>
+                    <input type="text" name="title" required><br>
+
+                    <label style="display:inline-block; width:100px;">Genre:</label>
+                    <input type="text" name="genre" required><br>
+
+                    <label style="display:inline-block; width:100px;">Actor:</label>
+                    <input type="text" name="actor"><br>
+
+                    <label style="display:inline-block; width:100px;">Director:</label>
+                    <input type="text" name="director"><br>
+
+                    <input type="submit" value="Insert Movie">
+                </fieldset>
+            </form>
+            </main>
+                    <h2 style = "text-align: center;">Your Movies</h2>
+
+            <ul style="list-style: none; padding: 0;">
+
+                {% for m in movies %}
+                <li style="
+                    padding: 12px; 
+                    margin-bottom: 12px; 
+                    border: 1px solid #ccc; 
+                    border-radius: 6px;
+                ">
+
+                    <div style="font-size: 18px; font-weight: bold; text-align: center;">
+                        {{ m[1] }}
                     </div>
+
+                    <div style="margin-top: 4px; margin-bottom: 10px; text-align: center;">
+                        Genre: {{ m[2] }} &nbsp;&nbsp;
+                        Actors: {{ m[3] }} &nbsp;&nbsp;
+                        Directors: {{ m[4] }}
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: nowrap;">
+
+                        <form action="/update-movie" method="POST" style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="hidden" name="movie_id" value="{{ m.id }}">
+
+                            <input type="text" name="title" placeholder="New title" style="width:140px;">
+                            <input type="text" name="genre" placeholder="New genre" style="width:140px;">
+                            <input type="text" name="actor" placeholder="New actor" style="width:140px;">
+                            <input type="text" name="director" placeholder="New director" style="width:140px;">
+                            <button type="submit" style="width:80px;">
+                                Update
+                            </button>
+                        </form>
+
+                         <form action="/remove-movie" method="POST" style="display:inline;">
+                            <input type="hidden" name="movie_id" value="{{ m.id }}">
+                            <button type="submit">Remove</button>
+                        </form>
+                    </div>
+                </li>
                 {% endfor %}
-            {% endif %}
-        {% endwith %}
-    <main style="width: 400px; margin: auto;">
-        <form action = "/insert-movie" method="POST" style="margin-bottom: 20px;">
-            <fieldset style="padding: 10px;">
-                <legend>Insert Movie</legend>
-                <label style="display:inline-block; width:100px;">Title:</label>
-                <input type="text" name="title" required><br>
 
-                <label style="display:inline-block; width:100px;">Genre:</label>
-                <input type="text" name="genre" required><br>
-
-                <label style="display:inline-block; width:100px;">Actor:</label>
-                <input type="text" name="actor"><br>
-
-                <label style="display:inline-block; width:100px;">Director:</label>
-                <input type="text" name="director"><br>
-
-                <input type="submit" value="Insert Movie">
-            </fieldset>
-        </form>
-        <form action="/update-movie" method="POST" style="margin-bottom: 20px;">
-            <fieldset style="padding: 10px;">
-                <legend>Update Movie</legend>
-                <label style="display:inline-block; width:100px;">Title:</label>
-                <input type="text" name="title"><br>
-
-                <label style="display:inline-block; width:100px;">Genre:</label>
-                <input type="text" name="genre"><br>
-
-                <label style="display:inline-block; width:100px;">Actor:</label>
-                <input type="text" name="actor"><br>
-
-                <label style="display:inline-block; width:100px;">Director:</label>
-                <input type="text" name="director"><br>
-
-                <input type="submit" value="Update Movie">
-            </fieldset>
-        </form>
-        <form action="/remove-movie" method="POST" style="margin-bottom: 20px;">
-            <fieldset style="padding: 10px;">
-                <legend>Remove Movie</legend>
-                <label style="display:inline-block; width:100px;">Title:</label>
-                <input type="text" name="title" required><br>
-
-                <label style="display:inline-block; width:100px;">Genre:</label>
-                <input type="text" name="genre" required><br>
-
-                <input type="submit" value="Remove Movie">
-            </fieldset>
-        </form>
-    </main>
+            </ul>
+    {% else %}
+       <h4 style = "text-align: center;">Login necessary to update your records</h4>
+    {% endif %}
 </body>
 
 </html>

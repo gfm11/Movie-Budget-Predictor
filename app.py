@@ -108,45 +108,42 @@ def searchResults():
     director = request.form.get("director") or ""
 
     searchQuery = """
-        SELECT 
-            M.title,
-            M.genres,
-            GROUP_CONCAT(DISTINCT (CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name ELSE NULL END) SEPARATOR ', ') AS Actors,
-            GROUP_CONCAT(DISTINCT (CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name ELSE NULL END) SEPARATOR ', ') AS Directors,
-            M.vote_average,
-            M.vote_count,
-            M.movie_status,
-            M.release_date,
-            M.revenue,
-            M.adult,
+       SELECT
+            MS.title,
+            MS.genres,
+            AD.Actors,
+            AD.Directors,
+            MS.vote_average,
+            MS.vote_count,
+            MS.movie_status,
+            MS.release_date,
+            MS.revenue,
+            MS.adult,
             B.movie_rank,
             B.worldwide_revenue,
             B.domestic_revenue,
             B.domestic_percentage
-        FROM MovieStatistics M
-        LEFT JOIN BoxOffice B ON M.id = B.movie_id
-        LEFT JOIN MembersAndAwards MA ON M.id = MA.movie_id
-        LEFT JOIN DirectorsAndActors D ON MA.member_id = D.member_id
-        WHERE M.title LIKE %s
-          AND M.genres LIKE %s
-        GROUP BY 
-            M.id, M.title, M.genres, M.vote_average, M.vote_count, M.movie_status, 
-            M.release_date, M.revenue, M.adult,
-            B.movie_rank, B.worldwide_revenue, B.domestic_revenue, B.domestic_percentage
-        HAVING
-            (%s = '' OR EXISTS (
-                SELECT 1
-                FROM MembersAndAwards ma2
-                JOIN DirectorsAndActors d2 ON ma2.member_id = d2.member_id
-                WHERE ma2.movie_id = M.id AND d2.roll_type = 'ACTOR' AND d2.member_name LIKE %s
-            ))
-        AND (%s = '' OR EXISTS (
-                SELECT 1
-                FROM MembersAndAwards ma3
-                JOIN DirectorsAndActors d3 ON ma3.member_id = d3.member_id
-                WHERE ma3.movie_id = M.id AND d3.roll_type = 'DIRECTOR' AND d3.member_name LIKE %s
-            ))
-        ORDER BY M.title;
+        FROM (
+            SELECT id, title, genres, vote_average, vote_count, movie_status,
+                release_date, revenue, adult
+            FROM MovieStatistics
+            WHERE title LIKE %s AND genres LIKE %s
+            ORDER BY release_date DESC
+            LIMIT 20
+        ) AS MS
+        LEFT JOIN BoxOffice B ON MS.id = B.movie_id
+        LEFT JOIN (
+            SELECT MA.movie_id,
+                GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS Actors,
+                GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS Directors
+            FROM MembersAndAwards MA
+            JOIN DirectorsAndActors D ON MA.member_id = D.member_id
+            GROUP BY MA.movie_id
+        ) AS AD ON MS.id = AD.movie_id
+        WHERE
+            (%s = '' OR AD.Actors LIKE %s)
+            AND (%s = '' OR AD.Directors LIKE %s)
+        ORDER BY MS.release_date DESC;
     """
     values = (f"%{title}%", f"%{genre}%", actor, f"%{actor}%", director, f"%{director}%")
     cursor.execute(searchQuery, values)
@@ -155,10 +152,27 @@ def searchResults():
     
 @app.route("/update", methods=["GET"])
 def update():
-    return render_template('Update.html')
+    user_id = request.cookies.get("user_id")
+    cursor.execute("""
+        SELECT 
+            M.id,
+            M.title,
+            M.genres,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
+        FROM MovieStatistics M
+        JOIN UserMovies U ON M.id = U.movie_id
+        LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
+        LEFT JOIN DirectorsAndActors D ON D.member_id = MA.member_id
+        WHERE U.user_id = %s
+        GROUP BY M.id, M.title, M.genres
+    """, (user_id,))
+    movies = cursor.fetchall()
+    return render_template('Update.html', movies=movies)
 
 @app.route("/insert-movie", methods=['POST']) #route that will submit the form to insert a movie
 def insertMovie():
+    user_id = request.cookies.get("user_id")
     title = request.form["title"]
     genre = request.form["genre"]
     actor = request.form.get("actor")
@@ -172,6 +186,8 @@ def insertMovie():
     values = (movieID, title, None, None, "Released", None, None, None, genre)
     cursor.execute(insertQuery, values)
 
+    movieInserted = cursor.rowcount > 0
+
     if actor:
         cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'ACTOR')", (actor,))
         actor_id = cursor.lastrowid  # get ID of inserted actor
@@ -182,48 +198,52 @@ def insertMovie():
         director_id = cursor.lastrowid  # get ID of inserted director
         cursor.execute("INSERT INTO MembersAndAwards (movie_id, member_id, movie_awards) VALUES (%s, %s, 0)", (movieID, director_id))
     
-    if cursor.rowcount > 0:
+    cursor.execute("INSERT INTO UserMovies (user_id, movie_id) VALUES (%s, %s)", (user_id,movieID))
+
+    db.commit()
+
+    if movieInserted > 0:
         flash("Movie Entered Successfully!", "success")
     else:
         flash("Insert unsuccessful. Check that you're logged in and spelling is correct.", "error")
-
-    db.commit()
+        
     return redirect("/update") # goes back to update page when done
 
 @app.route("/update-movie", methods=['POST']) # route that will submit the form to update a movie
 def updateMovie():
-    title = request.form["title"]
-    genre = request.form["genre"]
+    movie_id = request.form["movie_id"]
+    title = request.form.get("title")
+    genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")
 
-    updateQuery = "UPDATE MovieStatistics SET genres=%s WHERE title=%s"
-    values = (genre, title)
-    cursor.execute(updateQuery, values)
+    if title:
+        cursor.execute("UPDATE MovieStatistics SET title=%s WHERE id=%s", (title, movie_id))
+
+    if genre:
+        cursor.execute("UPDATE MovieStatistics SET genres=%s WHERE id=%s", (genre, movie_id))
+
 
     if actor: # update actor if needed
         cursor.execute("""
             UPDATE DirectorsAndActors D
-            JOIN MembersAndAwards MA ON D.member_id = MA.member_id
-            JOIN MovieStatistics M ON M.id = MA.movie_id
+            JOIN MembersAndAwards MA ON D.member_id = MA.id
             SET D.member_name = %s
-            WHERE M.title = %s AND D.roll_type = 'ACTOR'
-        """, (actor, title))
+            WHERE MA.id = %s AND D.roll_type = 'ACTOR'
+        """, (actor, movie_id))
 
     if director: # update director if needed
         cursor.execute("""
             UPDATE DirectorsAndActors D
             JOIN MembersAndAwards MA ON D.member_id = MA.member_id
-            JOIN MovieStatistics M ON M.id = MA.movie_id
+            JOIN MovieStatistics M ON M.id = MA.id
             SET D.member_name = %s
-            WHERE M.title = %s AND D.roll_type = 'DIRECTOR'
-        """, (director, title))
+            WHERE M.id = %s AND D.roll_type = 'DIRECTOR'
+        """, (director, movie_id))
 
     # print message if update is successful or unsuccessful
     if cursor.rowcount > 0:
         flash("Movie Updated Successfully!", "success")
-    elif not title or not genre:
-        flash("Please enter a title and genre to update.", "error")
     else:
         flash("Update unsuccessful. Check that you're logged in and spelling is correct.", "error")
 
@@ -232,17 +252,14 @@ def updateMovie():
 
 @app.route("/remove-movie", methods=['POST'])
 def removeMovie():
-    title = request.form["title"]
-    genre = request.form["genre"]
+    movie_id = request.form["movie_id"]
 
-    removeQuery = "DELETE FROM MovieStatistics WHERE title=%s AND genres=%s"
-                                                    
-    values = (title, genre)
-    cursor.execute(removeQuery, values)
+    cursor.execute("DELETE FROM MovieStatistics WHERE id=%s", (movie_id,))
+
     db.commit()
 
     if cursor.rowcount > 0:
-        flash("Movie Updated Successfully!", "success")
+        flash("Movie Removed Successfully!", "success")
     else:
         flash("Removal unsuccessful. Check that you're logged in and spelling is correct.", "error")
     return redirect("/update")
