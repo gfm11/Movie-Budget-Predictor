@@ -318,6 +318,10 @@ def PredictBoxOffice():
 def AwardsPredictor():
     return render_template('AwardsPredictor.html')
 
+@app.route("/predict-awards", methods=['POST'])
+def Predictawards():
+    return redirect("/AwardsPredictor")
+
 @app.context_processor
 def inject_user():
     username = request.cookies.get("username")

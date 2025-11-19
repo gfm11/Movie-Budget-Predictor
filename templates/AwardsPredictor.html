@@ -35,5 +35,100 @@
                 </div>
             </nav>
         </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div 
+                        style="margin: 10px auto; width: 400px; padding: 10px; border-radius: 5px;
+                            color: white; text-align: center;
+                        background-color: {% if category == 'error' %} #dc3545 {% elif category == 'success' %}#28a745{% else %}#007bff{% endif %};">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+    {% endwith %}
+    <main style="width: 400px; margin: auto;">
+        <form action= "/predict-awards" method="POST" style="margin-bottom: 20px;">
+            <fieldset style="padding: 10px;">
+                <legend>Awards Predictor</legend>
+                <label style="display:inline-block; width:100px;">Title:</label>
+                <input type="text" name="title"><br>
+
+                <label style="display:inline-block; width:100px;">Genre:</label>
+                <select name="genre" id="genres">
+                    <option value="Horror">Horror</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Crime">Crime</option>
+                    <option value="Family">Family</option>
+                    <option value="Animation">Animation</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="Action">Action</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Western">Western</option>
+                    <option value="Thriller">Family</option>
+                    <option value="Documentary">Documentary</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="War">War</option>
+                    <option value="History">History</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Music">Music</option>
+                </select>
+                <br>
+                <label style="display:inline-block; width:100px;">Actor:</label>
+                <input list="actor" name="actor">
+                <datalist id="actor">
+                    <option value="Leonardo DiCaprio">
+                    <option value="Joseph Gordon-Levitt">
+                    <option value="Elliot Page">
+                    <option value="Matthew McConaughey">
+                    <option value="Anne Hathaway">
+                    <option value="Jessica Chastain">
+                    <option value="Christian Bale">
+                    <option value="Heath Ledger">
+                    <option value="Aaron Eckhart">
+                    <option value="Sam Worthington">
+                    <option value="Sigourney Weaver">
+                    <option value="Robert Downey Jr.">
+                    <option value="Chris Evans">
+                    <option value="Scarlett Johansson">
+                    <option value="Ryan Reynolds">
+                    <option value="Morena Baccarin">
+                    <option value="T. J. Miller">
+                    <option value="Chris Hemsworth">
+                    <option value="Chris Pratt">
+                    <option value="Bradley Cooper">
+                    <option value="Daniel Radcliffe">
+                    <option value="Rupert Grint">
+                    <option value="Emma Watson">
+                    <option value="Gwyneth Paltrow">
+                    <option value="Terrence Howard">
+                </datalist>
+
+                <label style="display:inline-block; width:100px;">Director:</label>
+                <input list="director" name="director">
+                <datalist id="director">
+                    <option value="Christopher Nolan">
+                    <option value="James Cameron">
+                    <option value="Joss Whedon">
+                    <option value="Tim Miller">
+                    <option value="Anthony Russo">
+                    <option value="Joe Russo">
+                    <option value="James Gunn">
+                    <option value="Chris Columbus">
+                    <option value="Jon Favreau">
+                </datalist>
+                <label style="display:inline-block; width:100px;">Release:</label>
+                <select name="release" id="release">
+                    <option value="Q1">Q1</option>
+                    <option value="Q2">Q2</option>
+                    <option value="Q3">Q3</option>
+                    <option value="Q4">Q4</option>
+                <input type="submit" value="Predict">
+            </fieldset>
+        </form>
+    </main>
     </body>
 </html>
