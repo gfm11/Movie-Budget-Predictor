@@ -34,7 +34,7 @@ sudo mysql
 SET GLOBAL local_infile = 1;
 SHOW VARIABLES LIKE 'local_infile'; 
 
-make sure the output of these commands looks like this:
+make sure the output of these commands looks like this:  
 +---------------+-------+  
 | Variable_name | Value |  
 +---------------+-------+  
