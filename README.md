@@ -12,7 +12,7 @@ If you want to see the website as you are creating it, run python app.py in your
 
 # MySQL Connector
 To properly run the database in the app, you need a local version of our database, and mySQL connector.  
-To install mySQL connector, run these commands in your terminal:
+To install mySQL connector and start your mySQL server, run these commands in your terminal:
 
 pip install mysql-connector-python
 sudo apt update  
@@ -47,6 +47,11 @@ python setup_flask_database_codespaces.py
 
 again to import the data.
 
+To run the website, run this command in your terminal:
+
+python app.py
+
+and follow the forwarded port!
 
 To view where we got the percentages for our calculations, you can visit these links.
 Average ticket prices: https://www.the-numbers.com/market/
