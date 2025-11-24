@@ -311,7 +311,6 @@ def PredictBoxOffice():
     
     print("DB connection:", db.is_connected())
     advancedFunctions.calculate_national_box_office(db, genre, actor, director, release)
-
     return redirect("/BoxOfficePredictor")
 
 @app.route("/AwardsPredictor")
