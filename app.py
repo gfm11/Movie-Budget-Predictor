@@ -302,11 +302,11 @@ def PredictBoxOffice():
         flash("Predictor error. Invalid title name.", "error")
     
     # flash error if actor is not in the table
-    if(actorResult is None):
+    if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
 
     # flash error if director is not in the table
-    if(directorResult is None):
+    if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
     
     print("DB connection:", db.is_connected())
