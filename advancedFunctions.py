@@ -4,6 +4,7 @@
 
 # calculate projected domestic box office revenue
 def calculate_national_box_office(db, genre, actor, director, release):
+    # ADD COUNTER FOR NUMBER OF MOVIES PULLED BY QUERY!!!!!
 
     # average ticket price for years 2000-2025
     ticket_prices = [5.39, 5.65, 5.80, 6.03, 6.21, 6.41, 6.55, 6.88, 7.18, 7.50, 7.89, 7.93, 
@@ -25,35 +26,33 @@ def calculate_national_box_office(db, genre, actor, director, release):
     values = [actor, director, genre, 2019, start_month, end_month, 0]
     retvals = cursor_avg_revenue.callproc('averageDomesticRevenue', values)
     avg_revenue = retvals[6] # getting the output from the returned values
-    print("AVERAGE REVENUE: ", avg_revenue)
 
     # used as a counter for total number of tickets
-    total_tickets_sold_genre = 0
-    """
+    total_tickets_sold = 0
     for i in range(26): # iterates from 0 to 25, representing years after 2000
 
         # submit query and store average revenue
-        cursor_revenue = db.cursor(buffered=True)
-        values = (f"%{genre}%", start_month, end_month, 2000 + i)
-        cursor_revenue.execute(genreQuery, values)
-        result = cursor_revenue.fetchone()
+        cursor_avg_revenue = db.cursor(buffered=True)
+        values = [actor, director, genre, 2000 + i, start_month, end_month, 0]
+        retvals = cursor_avg_revenue.callproc('averageDomesticRevenue', values)
 
         # defines avg_revenue if applicable, otherwise set zero
-        if result and result[0] is not None:
-            avg_revenue = float(result[0])  # convert to float for later division
+        if retvals and retvals[6] is not None:
+            avg_revenue = float(retvals[6])  # convert to float for later division
+            print("AVERAGE REVENUE: ", avg_revenue)
             
         else:
             avg_revenue = 0  # default to 0 if no data found
             
         # find tickets sold for the year and add to total
         tickets_sold = avg_revenue / ticket_prices[i]
-        total_tickets_sold_genre += tickets_sold
+        total_tickets_sold += tickets_sold
 
-        cursor_revenue.close()"""
-
-    # find average box office for movies with the same actor (has more impact) sort by genre and year
+        cursor_avg_revenue.close()
     
-    # find average box office for movies with the same director (has smallest impact) sort by genre and year
+    print("TICKETS SOLD: ", total_tickets_sold)
+
+
 
 # calculate projected foreign box office revenue
 def calculate_foreign_box_office(genre, actor, director, release):
