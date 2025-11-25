@@ -85,7 +85,7 @@ create table if not exists UserMovies (
 DROP PROCEDURE IF EXISTS averageDomesticRevenue;
 
 -- changing delimiter so ; can be used inside the procedure
-DELIMITER $
+DELIMITER $$
 
 -- procedure for retrieving movies for box office predictor advanced function
 -- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
@@ -112,7 +112,8 @@ BEGIN
         AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
         AND ((input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
         OR (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-        OR (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))));
+        OR (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%')))
+    ) AS unique_movies;
 
     SELECT IFNULL(COUNT(*), 0)
     INTO movie_count
@@ -132,7 +133,8 @@ BEGIN
         AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
         AND ((input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
         OR (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-        OR (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))));
-END$
+        OR (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%')))
+    ) AS unique_movies_count;
+END$$
 
 DELIMITER ;
