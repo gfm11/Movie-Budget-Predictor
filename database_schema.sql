@@ -89,7 +89,7 @@ DELIMITER $$
 
 -- procedure for retrieving movies for box office predictor advanced function
 -- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
--- returns average revenue from those movies
+-- returns average revenue from those movies and count of movies used in the calculation
 CREATE PROCEDURE averageDomesticRevenue(IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255),
                                            IN input_year INT, IN input_quarter_start INT, IN input_quarter_end INT, 
                                            OUT avg_revenue FLOAT, OUT movie_count FLOAT)

@@ -4,8 +4,6 @@
 
 # calculate projected domestic box office revenue
 def calculate_national_box_office(db, genre, actor, director, release):
-    # ADD COUNTER FOR NUMBER OF MOVIES PULLED BY QUERY!!!!!
-
     # average ticket price for years 2000-2025
     ticket_prices = [5.39, 5.65, 5.80, 6.03, 6.21, 6.41, 6.55, 6.88, 7.18, 7.50, 7.89, 7.93, 
                     7.96, 8.13, 8.17, 8.43, 8.65, 8.97, 9.11, 9.16, 9.18, 10.17, 10.53, 10.78, 11.31, 11.31]
@@ -61,11 +59,13 @@ def calculate_national_box_office(db, genre, actor, director, release):
     
     # calculate projected box office
     tickets_per_movie = total_tickets_sold_weighted / total_movies_matched_weighted
-    projected_box_office = tickets_per_movie * ticket_prices[24]
+    projected_box_office = int(tickets_per_movie * ticket_prices[24])
     print("TICKETS SOLD: ", total_tickets_sold_weighted)
     print("MOVIES MATCHED: ", total_movies_matched_weighted)
     print("TICKS PER MOVIE: ", tickets_per_movie)
     print("PROJECTED BOX OFFICE: ", projected_box_office)
+
+    return projected_box_office
 
 
 # calculate projected foreign box office revenue
