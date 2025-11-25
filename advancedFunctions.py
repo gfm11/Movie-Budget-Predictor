@@ -21,19 +21,22 @@ def calculate_national_box_office(db, genre, actor, director, release):
     # start and end months for the quarter inputted 
     start_month, end_month = quarter_ranges[release]
 
-    # get average revenue from database procedure
-    cursor_avg_revenue = db.cursor(buffered=True)
-    values = [actor, director, genre, 2019, start_month, end_month, 0]
-    retvals = cursor_avg_revenue.callproc('averageDomesticRevenue', values)
-    avg_revenue = retvals[6] # getting the output from the returned values
-
     # used as a counter for total number of tickets
     total_tickets_sold = 0
+
+    # used as a counter for total number of movies
+    total_movies_matched = 0 
+
+    # get total tickets sold and total movies matched from 2000-2025
     for i in range(26): # iterates from 0 to 25, representing years after 2000
+
+        # holds returned values from SQL procedure
+        avg_revenue = 0
+        num_movies = 0
 
         # submit query and store average revenue
         cursor_avg_revenue = db.cursor(buffered=True)
-        values = [actor, director, genre, 2000 + i, start_month, end_month, 0]
+        values = [actor, director, genre, 2000 + i, start_month, end_month, 0, 0]
         retvals = cursor_avg_revenue.callproc('averageDomesticRevenue', values)
 
         # defines avg_revenue if applicable, otherwise set zero
@@ -41,12 +44,15 @@ def calculate_national_box_office(db, genre, actor, director, release):
             avg_revenue = float(retvals[6])  # convert to float for later division
             print("AVERAGE REVENUE: ", avg_revenue)
             
-        else:
-            avg_revenue = 0  # default to 0 if no data found
+        if retvals and retvals[7] is not None:
+            num_movies = float(retvals[7])
+            print("NUMBER OF MOVIES: ", num_movies)
             
         # find tickets sold for the year and add to total
         tickets_sold = avg_revenue / ticket_prices[i]
         total_tickets_sold += tickets_sold
+        total_movies_matched += num_movies
+        
 
         cursor_avg_revenue.close()
     

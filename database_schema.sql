@@ -86,15 +86,36 @@ DROP PROCEDURE IF EXISTS averageDomesticRevenue;
 
 -- changing delimiter so ; can be used inside the procedure
 DELIMITER $
+
 -- procedure for retrieving movies for box office predictor advanced function
 -- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
 -- returns average revenue from those movies
 CREATE PROCEDURE averageDomesticRevenue(IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255),
                                            IN input_year INT, IN input_quarter_start INT, IN input_quarter_end INT, 
-                                           OUT avg_revenue FLOAT)
+                                           OUT avg_revenue FLOAT, OUT movie_count FLOAT)
 BEGIN
     SELECT IFNULL(AVG(domestic_revenue), 0)
     INTO avg_revenue
+    FROM (
+        SELECT DISTINCT M.title, B.domestic_revenue
+        FROM MovieStatistics M
+        JOIN BoxOffice B ON B.movie_id = M.id
+        LEFT JOIN MembersAndAwards MA_actor 
+            ON MA_actor.movie_id = M.id
+        LEFT JOIN DirectorsAndActors DA_actor 
+            ON DA_actor.member_id = MA_actor.member_id AND DA_actor.roll_type = 'ACTOR'
+        LEFT JOIN MembersAndAwards MA_director 
+            ON MA_director.movie_id = M.id
+        LEFT JOIN DirectorsAndActors DA_director 
+            ON DA_director.member_id = MA_director.member_id AND DA_director.roll_type = 'DIRECTOR'
+        WHERE YEAR(M.release_date) = input_year
+        AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
+        AND ((input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
+        OR (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
+        OR (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))));
+
+    SELECT IFNULL(COUNT(*), 0)
+    INTO movie_count
     FROM (
         SELECT DISTINCT M.title, B.domestic_revenue
         FROM MovieStatistics M
