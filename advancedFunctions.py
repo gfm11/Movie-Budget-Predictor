@@ -22,10 +22,10 @@ def calculate_national_box_office(db, genre, actor, director, release):
     start_month, end_month = quarter_ranges[release]
 
     # used as a counter for total number of tickets
-    total_tickets_sold = 0
+    total_tickets_sold_weighted = 0
 
     # used as a counter for total number of movies
-    total_movies_matched = 0 
+    total_movies_matched_weighted = 0 
 
     # get total tickets sold and total movies matched from 2000-2025
     for i in range(26): # iterates from 0 to 25, representing years after 2000
@@ -33,6 +33,9 @@ def calculate_national_box_office(db, genre, actor, director, release):
         # holds returned values from SQL procedure
         avg_revenue = 0
         num_movies = 0
+
+        # weights movies so newer movies have a larger effect than older ones, on a scale from 1.0 to 2.5
+        weight = 1.0 + (i / 25) * 1.5
 
         # submit query and store average revenue
         cursor_avg_revenue = db.cursor(buffered=True)
@@ -50,14 +53,19 @@ def calculate_national_box_office(db, genre, actor, director, release):
             
         # find tickets sold for the year and add to total
         tickets_sold = avg_revenue / ticket_prices[i]
-        total_tickets_sold += tickets_sold
-        total_movies_matched += num_movies
+        total_tickets_sold_weighted += tickets_sold * weight
+        total_movies_matched_weighted += num_movies * weight
         
 
         cursor_avg_revenue.close()
     
-    print("TICKETS SOLD: ", total_tickets_sold)
-
+    # calculate projected box office
+    tickets_per_movie = total_tickets_sold_weighted / total_movies_matched_weighted
+    projected_box_office = tickets_per_movie * ticket_prices[24]
+    print("TICKETS SOLD: ", total_tickets_sold_weighted)
+    print("MOVIES MATCHED: ", total_movies_matched_weighted)
+    print("TICKS PER MOVIE: ", tickets_per_movie)
+    print("PROJECTED BOX OFFICE: ", projected_box_office)
 
 
 # calculate projected foreign box office revenue
