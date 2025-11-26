@@ -325,22 +325,22 @@ def PredictBoxOffice():
     directorResult = cursor_director.fetchone()
     cursor_director.close()
 
-    #flash error if title is not in the table
+    # flash error if title is not in the table
     if(titleResult is None and not(title == "")):
         flash("Predictor error. Invalid title name.", "error")
     
     # flash error if actor is not in the table
-    if(actorResult is None):
+    if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
 
     # flash error if director is not in the table
-    if(directorResult is None):
+    if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
     
     print("DB connection:", db.is_connected())
-    advancedFunctions.calculate_national_box_office(db, genre, actor, director, release)
-
-    return redirect("/BoxOfficePredictor")
+    domestic_prediction = advancedFunctions.calculate_national_box_office(db, genre, actor, director, release)
+    print("DOMESTIC: ", domestic_prediction)
+    return render_template('BoxOfficePredictor.html', domestic_value = domestic_prediction)
 
 @app.route("/AwardsPredictor")
 def AwardsPredictor():

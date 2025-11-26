@@ -128,5 +128,9 @@
             </fieldset>
         </form>
     </main>
+
+    {% if domestic_value %}
+    <h3 style="text-align: center;">Predicted Domestic Revenue: ${{domestic_value}}</h3>
+    {% endif %}
     </body>
 </html>

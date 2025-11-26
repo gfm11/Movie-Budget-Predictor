@@ -53,5 +53,6 @@ python app.py
 
 and follow the forwarded port!
 
-To view where we got the percentages for our calculations, you can visit these links.
-Average ticket prices: https://www.the-numbers.com/market/
+To view where we got the percentages for our calculations, you can visit these links.  
+Domestic ticket prices: https://www.the-numbers.com/market/  
+UK and Ireland ticket prices: https://filmdistributorsassociation.com/the-industry/databank/uk-and-ireland-market-trends/average-ticket-price/  
