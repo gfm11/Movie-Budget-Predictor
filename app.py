@@ -189,13 +189,24 @@ def insertMovie():
     movieInserted = cursor.rowcount > 0
 
     if actor:
-        cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'ACTOR')", (actor,))
-        actor_id = cursor.lastrowid  # get ID of inserted actor
+        cursor.execute("SELECT member_id FROM DirectorsAndActors WHERE member_name = %s AND roll_type = 'ACTOR'", (actor,))
+        row = cursor.fetchone()
+        if row:
+            actor_id = row[0]
+        else:
+            cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'ACTOR')", (actor,))
+            actor_id = cursor.lastrowid  # get ID of inserted actor
         cursor.execute("INSERT INTO MembersAndAwards (movie_id, member_id, movie_awards) VALUES (%s, %s, 0)", (movieID, actor_id))
 
     if director:
-        cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'DIRECTOR')", (director,))
-        director_id = cursor.lastrowid  # get ID of inserted director
+        cursor.execute("SELECT member_id FROM DirectorsAndActors WHERE member_name = %s AND roll_type = 'DIRECTOR'", (director,))
+        row = cursor.fetchone()
+        if row:
+            director_id = row[0]
+        else:
+            cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'DIRECTOR')", (director,))
+            director_id = cursor.lastrowid  # get ID of inserted director
+            
         cursor.execute("INSERT INTO MembersAndAwards (movie_id, member_id, movie_awards) VALUES (%s, %s, 0)", (movieID, director_id))
     
     cursor.execute("INSERT INTO UserMovies (user_id, movie_id) VALUES (%s, %s)", (user_id,movieID))
@@ -225,21 +236,38 @@ def updateMovie():
 
 
     if actor: # update actor if needed
-        cursor.execute("""
-            UPDATE DirectorsAndActors D
-            JOIN MembersAndAwards MA ON D.member_id = MA.id
-            SET D.member_name = %s
-            WHERE MA.id = %s AND D.roll_type = 'ACTOR'
-        """, (actor, movie_id))
+        cursor.execute("SELECT member_id FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'", (actor,))
+        actor_row = cursor.fetchone()
 
-    if director: # update director if needed
+        if actor_row:
+            actor_id = actor_row[0]
+        else:
+            cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'ACTOR')", (actor,))
+            actor_id = cursor.lastrowid
+
         cursor.execute("""
-            UPDATE DirectorsAndActors D
-            JOIN MembersAndAwards MA ON D.member_id = MA.member_id
-            JOIN MovieStatistics M ON M.id = MA.id
-            SET D.member_name = %s
-            WHERE M.id = %s AND D.roll_type = 'DIRECTOR'
-        """, (director, movie_id))
+            UPDATE MembersAndAwards MA
+            JOIN DirectorsAndActors D ON MA.member_id = D.member_id
+            SET MA.member_id = %s
+            WHERE MA.movie_id = %s AND D.roll_type = 'ACTOR'
+        """, (actor_id, movie_id))
+
+    if director:
+        cursor.execute("SELECT member_id FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'", (director,))
+        director_row = cursor.fetchone()
+
+        if director_row:
+            director_id = director_row[0]
+        else:
+            cursor.execute("INSERT INTO DirectorsAndActors (member_name, roll_type) VALUES (%s, 'DIRECTOR')", (director,))
+            director_id = cursor.lastrowid
+
+        cursor.execute("""
+            UPDATE MembersAndAwards MA
+            JOIN DirectorsAndActors D ON MA.member_id = D.member_id
+            SET MA.member_id = %s
+            WHERE MA.movie_id = %s AND D.roll_type = 'DIRECTOR'
+        """, (director_id, movie_id))
 
     # print message if update is successful or unsuccessful
     if cursor.rowcount > 0:
