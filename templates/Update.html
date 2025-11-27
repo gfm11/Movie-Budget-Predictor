@@ -95,7 +95,7 @@
                     <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: nowrap;">
 
                         <form action="/update-movie" method="POST" style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <input type="hidden" name="movie_id" value="{{ m.id }}">
+                            <input type="hidden" name="movie_id" value="{{ m[0] }}">
 
                             <input type="text" name="title" placeholder="New title" style="width:140px;">
                             <input type="text" name="genre" placeholder="New genre" style="width:140px;">
@@ -107,7 +107,7 @@
                         </form>
 
                          <form action="/remove-movie" method="POST" style="display:inline;">
-                            <input type="hidden" name="movie_id" value="{{ m.id }}">
+                            <input type="hidden" name="movie_id" value="{{ m[0] }}">
                             <button type="submit">Remove</button>
                         </form>
                     </div>

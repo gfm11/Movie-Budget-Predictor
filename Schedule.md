@@ -1,6 +1,6 @@
 - [x] Log in feature 
-- [ ] update insert movie function
-- [ ] fix update actor and directors
+- [x] update insert movie function
+- [x] fix update actor and directors
 - [ ] fix search
 - [ ] fix local copy inserting
 - [ ] implement box ofice predictor function
@@ -11,4 +11,4 @@
 - [x] Navigation on all pages
 - [ ] update look of webpages
 - [x] make deleting easier (delete from a list rather than entering the movie title and genre)
-- [ ] disallow duplicate entries in DirectorsAndActors table
+- [x] disallow duplicate entries in DirectorsAndActors table
