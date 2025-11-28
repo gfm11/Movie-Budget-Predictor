@@ -1,9 +1,9 @@
 - [x] Log in feature 
 - [x] update insert movie function
 - [x] fix update actor and directors
-- [ ] fix search
+- [x] fix search
 - [ ] fix local copy inserting
-- [ ] implement box ofice predictor function
+- [x] implement box ofice predictor function
 - [ ] implement Awards predictor function
 - [x] Different update and delete function
 - [x] Message after update and deletion

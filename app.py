@@ -113,37 +113,39 @@ def searchResults():
             MS.genres,
             AD.Actors,
             AD.Directors,
-            MS.vote_average,
-            MS.vote_count,
             MS.movie_status,
             MS.release_date,
-            MS.revenue,
             MS.adult,
             B.movie_rank,
             B.worldwide_revenue,
             B.domestic_revenue,
             B.domestic_percentage
-        FROM (
-            SELECT id, title, genres, vote_average, vote_count, movie_status,
-                release_date, revenue, adult
-            FROM MovieStatistics
-            WHERE title LIKE %s AND genres LIKE %s
-            ORDER BY release_date DESC
-            LIMIT 20
-        ) AS MS
-        LEFT JOIN BoxOffice B ON MS.id = B.movie_id
-        LEFT JOIN (
-            SELECT MA.movie_id,
-                GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS Actors,
-                GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS Directors
-            FROM MembersAndAwards MA
-            JOIN DirectorsAndActors D ON MA.member_id = D.member_id
-            GROUP BY MA.movie_id
-        ) AS AD ON MS.id = AD.movie_id
-        WHERE
-            (%s = '' OR AD.Actors LIKE %s)
-            AND (%s = '' OR AD.Directors LIKE %s)
-        ORDER BY MS.release_date DESC;
+        FROM (SELECT id, title, genres, movie_status, release_date, adult FROM MovieStatistics WHERE title LIKE %s AND genres LIKE %s) MS 
+            LEFT JOIN BoxOffice B ON MS.title = B.title
+            LEFT JOIN (SELECT MA.movie_id,
+                        GROUP_CONCAT(CASE WHEN DA.roll_type = 'ACTOR' THEN DA.member_name END SEPARATOR ', ') AS Actors,
+                        GROUP_CONCAT(CASE WHEN DA.roll_type = 'DIRECTOR' THEN DA.member_name END SEPARATOR ', ') AS Directors
+                    FROM MembersAndAwards MA
+                    JOIN DirectorsAndActors DA ON DA.member_id = MA.member_id
+                    GROUP BY MA.movie_id) AD ON MS.id = AD.movie_id
+                    WHERE
+                        (%s = '' OR EXISTS (
+                            SELECT 1 FROM MembersAndAwards MA2
+                            JOIN DirectorsAndActors DA2 ON DA2.member_id = MA2.member_id
+                            WHERE MA2.movie_id = MS.id 
+                            AND DA2.roll_type = 'ACTOR' 
+                            AND DA2.member_name LIKE %s
+                        ))
+                        AND
+                        (%s = '' OR EXISTS (
+                            SELECT 1 FROM MembersAndAwards MA3
+                            JOIN DirectorsAndActors DA3 ON DA3.member_id = MA3.member_id
+                            WHERE MA3.movie_id = MS.id 
+                            AND DA3.roll_type = 'DIRECTOR' 
+                            AND DA3.member_name LIKE %s
+                        ))
+                            ORDER BY MS.release_date DESC
+                            LIMIT 20;
     """
     values = (f"%{title}%", f"%{genre}%", actor, f"%{actor}%", director, f"%{director}%")
     cursor.execute(searchQuery, values)
