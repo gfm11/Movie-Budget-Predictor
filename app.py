@@ -144,8 +144,8 @@ def searchResults():
                             AND DA3.roll_type = 'DIRECTOR' 
                             AND DA3.member_name LIKE %s
                         ))
-                            ORDER BY MS.release_date DESC
-                            LIMIT 20;
+        ORDER BY MS.release_date DESC
+        LIMIT 20;
     """
     values = (f"%{title}%", f"%{genre}%", actor, f"%{actor}%", director, f"%{director}%")
     cursor.execute(searchQuery, values)
