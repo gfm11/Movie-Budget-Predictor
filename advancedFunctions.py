@@ -67,7 +67,6 @@ def calculate_national_box_office(db, genre, actor, director, release):
 
     return projected_box_office
 
-
 # calculate projected foreign box office revenue
 def calculate_foreign_box_office(db, genre, actor, director, release):
         # average ticket price for years 2000-2025

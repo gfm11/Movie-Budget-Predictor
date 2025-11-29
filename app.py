@@ -15,7 +15,7 @@ db = mysql.connector.connect(
 )
 
 
-cursor = db.cursor()
+cursor = db.cursor(buffered=True)
 
 print("CSV data imported successfully!")
 @app.route("/") #creating route for the home page of our website
