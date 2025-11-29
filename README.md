@@ -19,9 +19,6 @@ sudo apt update
 sudo apt install mysql-server -y  
 sudo service mysql start && sudo mysql --local-infile=1 -u root
 
-After those three commands have been run, you need to create a local copy of the database.
-Run sudo mysql < database_schema.sql to create a copy of our database.
-
 Then, to create a working copy of the actual data in our database, run the command:  
 
 python setup_flask_database_codespaces.py
