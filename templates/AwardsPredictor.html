@@ -129,6 +129,9 @@
                 <input type="submit" value="Predict">
             </fieldset>
         </form>
+        {% if Awards_percentage %}
+            <h3 style="text-align: center;">Predicted Awards Likleyhood: </br> {{Awards_percentage}} %</h3>
+        {% endif %}
     </main>
     </body>
 </html>

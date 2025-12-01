@@ -131,3 +131,66 @@ def calculate_foreign_box_office(db, genre, actor, director, release):
     print("PROJECTED BOX OFFICE: ", projected_box_office)
 
     return projected_box_office
+
+def calculate_award_percentage(db, genre, actor, director, release):
+
+    quarter_weights = {
+        "Q1": 0.85, "Q2": 1.00, "Q3": 1.15, "Q4": 1.30   
+    }
+
+    quarter_weight = quarter_weights.get(release, 1.0)
+
+    all_awards = 0
+
+    for i in range(26):
+
+        weight_fullmatch = 1.0 + (i / 25) * 1.5
+
+        cursor_actor = db.cursor(buffered=True)
+        ActorQuery = "SELECT IFNULL(SUM(member_awards), 0) FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
+        cursor_actor.execute(ActorQuery, (actor,))
+        actor_awards = cursor_actor.fetchone()[0]
+        cursor_actor.close()
+
+        cursor_director = db.cursor(buffered=True)
+        DirectorQuery = "SELECT IFNULL(SUM(member_awards), 0) FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
+        cursor_director.execute(DirectorQuery, (director,))
+        director_awards = cursor_director.fetchone()[0]
+        cursor_director.close()
+
+        if actor_awards > director_awards:
+            weight_actor = 1.0 + (i / 25) * 1.2
+            weight_director = 1.0 + (i / 25)
+        else:
+            weight_actor = 1.0 + (i / 25)
+            weight_director = 1.0 + (i / 25) * 1.2
+
+        cursor = db.cursor(buffered=True)
+        values = [actor, director, genre, 2000 + i, 0]
+        projected_Awards = cursor.callproc('averageAwardPerformance', values)
+
+        avg_awards = float(projected_Awards[4]) if projected_Awards[4] else 0.0
+
+        values_actor = [actor, "", genre, 2000 + i, 0]
+        projected_Awards_actor = cursor.callproc('averageAwardPerformance', values_actor)
+
+        avg_awards_actor = float(projected_Awards_actor[4]) if projected_Awards_actor[4] else 0.0
+
+        values_director = ["", director, genre, 2000 + i, 0]
+        projected_Awards_director = cursor.callproc('averageAwardPerformance', values_director)
+
+        avg_awards_director = float(projected_Awards_director[4]) if projected_Awards_director[4] else 0.0
+        cursor.close()
+
+        combined = ((avg_awards * weight_fullmatch + avg_awards_actor * weight_actor + avg_awards_director * weight_director) / 3) * quarter_weight
+
+        all_awards += combined
+
+    cursor = db.cursor(buffered=True)
+    cursor.execute("SELECT MAX(movie_awards) FROM MembersAndAwards")
+    max_awards = cursor.fetchone()[0] or 1
+    cursor.close()
+
+    percentage = min(100, (all_awards / max_awards) * 100)
+
+    return round(percentage, 2)

@@ -139,9 +139,7 @@ END$$
 
 DELIMITER ;
 
-DELIMITER $$
-
-DROP TABLE IF EXISTS averageForeignRevenue;
+DROP PROCEDURE IF EXISTS averageForeignRevenue;
 
 -- procedure for retrieving movies for foreign box office predictor advanced function
 -- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
@@ -194,4 +192,24 @@ BEGIN
     ) AS unique_movies_count;
 END$$
 
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS averageAwardPerformance;
+
+DELIMITER $$
+CREATE PROCEDURE averageAwardPerformance(
+    IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255), IN input_year INT,
+    OUT avg_awards FLOAT
+)
+BEGIN
+    SELECT IFNULL(AVG(MA.movie_awards), 0)
+    INTO avg_awards
+    FROM MovieStatistics M
+    LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
+    LEFT JOIN DirectorsAndActors DA ON DA.member_id = MA.member_id
+    WHERE YEAR(M.release_date) = input_year
+      AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
+      AND (input_actor = '' OR (DA.roll_type='ACTOR' AND DA.member_name LIKE CONCAT('%', input_actor, '%')))
+      AND (input_director = '' OR (DA.roll_type='DIRECTOR' AND DA.member_name LIKE CONCAT('%', input_director, '%')));
+END$$
 DELIMITER ;

@@ -354,7 +354,32 @@ def AwardsPredictor():
 
 @app.route("/predict-awards", methods=['POST'])
 def Predictawards():
-    return redirect("/AwardsPredictor")
+    genre = request.form.get("genre")
+    actor = request.form.get("actor")
+    director = request.form.get("director")
+    release = request.form.get("release")
+
+    cursor_actor = db.cursor(buffered=True)
+    validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
+    cursor_actor.execute(validActorQuery, (actor,))
+    actorResult = cursor_actor.fetchone()
+    cursor_actor.close()
+
+    cursor_director = db.cursor(buffered=True)
+    validDirectorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
+    cursor_director.execute(validDirectorQuery, (director,))
+    directorResult = cursor_director.fetchone()
+    cursor_director.close()
+    
+    if(actorResult is None and not(actor == "")):
+        flash("Predictor error. Invalid actor name.", "error")
+
+    if(directorResult is None and not (director == "")):
+        flash("Predictor error. Invalid director name", "error")
+
+    percentage_of_awards = advancedFunctions.calculate_award_percentage(db, genre, actor, director, release)
+
+    return render_template('AwardsPredictor.html', Awards_percentage = percentage_of_awards)
 
 @app.context_processor
 def inject_user():
