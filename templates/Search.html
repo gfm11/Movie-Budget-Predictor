@@ -108,6 +108,19 @@
       background:white !important;
     }
 
+        .flash-box{
+      margin: 10px auto;
+      width: 420px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align:center;
+      color:white;
+      font-weight:500;
+    }
+    .flash-success{background: var(--sage);}
+    .flash-error{background: var(--terracotta);}
+    .flash-info{background: #8C7F75;}
+
   </style>
 </head>
 
@@ -137,6 +150,16 @@
 
   <h1>Search Movies</h1>
   <div class="divider"></div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-box {% if category=='success' %}flash-success{% elif category=='error' %}flash-error{% else %}flash-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
   <form action="/search-results" method="POST" class="search-card">
     <fieldset>

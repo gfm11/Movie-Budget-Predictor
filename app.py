@@ -150,6 +150,10 @@ def searchResults():
     values = (f"%{title}%", f"%{genre}%", actor, f"%{actor}%", director, f"%{director}%")
     cursor.execute(searchQuery, values)
     results = cursor.fetchall()
+
+    if not results:
+        flash("No results found. Please try different search terms.", "error")
+
     return render_template('Search.html', results = results)
     
 @app.route("/update", methods=["GET"])
