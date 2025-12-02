@@ -300,18 +300,10 @@ def BoxOfficePredictor():
 
 @app.route("/predict-box-office", methods=['POST'])
 def PredictBoxOffice():
-    title = request.form["title"]
     genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")
     release = request.form.get("release")
-
-    # check if the title is valid
-    cursor_title = db.cursor(buffered=True)
-    validTitleQuery = "SELECT 1 FROM MovieStatistics WHERE title=%s"
-    cursor_title.execute(validTitleQuery, (title,))
-    titleResult = cursor_title.fetchone()
-    cursor_title.close()
 
     # check if the actor is valid
     cursor_actor = db.cursor(buffered=True)
@@ -326,18 +318,16 @@ def PredictBoxOffice():
     cursor_director.execute(validDirectorQuery, (director,))
     directorResult = cursor_director.fetchone()
     cursor_director.close()
-
-    # flash error if title is not in the table
-    if(titleResult is None and not(title == "")):
-        flash("Predictor error. Invalid title name.", "error")
     
     # flash error if actor is not in the table
     if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
+        return render_template('BoxOfficePredictor.html')
 
     # flash error if director is not in the table
     if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
+        return render_template('BoxOfficePredictor.html')
 
     # get results from box office calculations
     print("DB connection:", db.is_connected())
@@ -345,6 +335,11 @@ def PredictBoxOffice():
     print("DOMESTIC: ", domestic_prediction)
     foreign_prediction = advancedFunctions.calculate_foreign_box_office(db, genre, actor, director, release)
     print("FOREIGN: ", foreign_prediction)
+
+    # flash error if there are no matched movies
+    if(domestic_prediction == -1 or foreign_prediction == -1):
+        flash("Predictor error. No data with matching fields exists.", "error")
+        return render_template('BoxOfficePredictor.html')
 
     return render_template('BoxOfficePredictor.html', domestic_value = domestic_prediction, foreign_value = foreign_prediction)
 

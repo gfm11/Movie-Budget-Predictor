@@ -1,65 +1,181 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Movie Budget Predictor</title>
-       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    </head>
-    <style>
-        img{
-            display: block;
-            margin: 0 auto;
-            padding: 50px 60px 30px 60px;
-        }
-        hr {
-            border: none;
-            border-top: 3px solid black;
-        }
-    </style>
-    <body style="background-color:rgb(233, 231, 229);">
-        <div class = "container">
-            <nav class="navbar navbar-expand-lg" style="background-color:rgba(203, 205, 207, 0.6);">
-                <div class="container-fluid">
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="/search">Search Records</a>
-                        <a class="nav-link active" aria-current="page" href="/update">Update Records</a>
-                        <a class="nav-link active" aria-current="page" href="/BoxOfficePredictor">Box Office Predictor</a>
-                        <a class="nav-link active" aria-current="page" href="/AwardsPredictor">Awards Predictor</a>
-                        <ul class="navbar-nav ms-auto">
-                            {% if username %}
-                                <li class="nav-item">
-                                    <span class="nav-link text-dark">
-                                        Hello, <strong>{{ username }}</strong>
-                                    </span>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/logout">Log out</a>
-                                </li>
-                            {% else %}
-                                <a class="nav-link active" aria-current="page" href="/login">Log in</a>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-                </div>
-            </nav>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Statistics Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #EDE7DD;
+      --cream: #F7F3EF;
+      --text: #3E3A31;
+      --muted:#5A564D;
+      --sage: #6D8A6E;
+      --radius: 12px;
+    }
+    body{
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, sans-serif;
+      padding-bottom: 40px;
+    }
+
+    .navbar{
+      background: var(--cream);
+      border-bottom: 1px solid #D8CFC4;
+      padding: 12px 0;
+    }
+    .navbar a{
+      color: var(--text);
+      margin-right: 18px;
+      font-weight: 500;
+    }
+    .navbar a:hover{
+      color: var(--sage);
+    }
+    .navbar .nav-link {
+      padding: 8px 18px;
+      border-radius: 999px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .navbar .nav-link:hover {
+      background: var(--sage);
+      color: white;
+    }
+
+
+    .hero-img{
+      display: block;
+      margin: 40px auto 20px auto;
+      max-width: 750px;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+    }
+    .main-title{
+      text-align:center;
+      font-size: 48px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    .subtitle{
+      text-align:center;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .divider{
+      height: 1px;
+      max-width: 900px;
+      margin: 22px auto;
+      background: linear-gradient(to right, rgba(109,138,110,0), rgba(109,138,110,0.3), rgba(109,138,110,0));
+    }
+
+    .section-title{
+      text-align:center;
+      margin: 40px 0 28px;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .highlight-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hl{
+      background: transparent;
+      border-left: 6px solid rgba(109,138,110,0.35);
+      padding: 18px 20px;
+      border-radius: 10px;
+      display:flex;
+      align-items:flex-start;
+      gap: 16px;
+    }
+    .num{
+      width: 40px;
+      height: 40px;
+      background: var(--sage);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius: 50%;
+      font-weight:700;
+      flex-shrink:0;
+    }
+    .hl h4{
+      margin:0;
+      font-size:20px;
+    }
+    .hl p{
+      margin-top:6px;
+      color: var(--muted);
+      line-height:1.6;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link" href="/search">Search Records</a>
+            <a class="nav-link" href="/update">Update Records</a>
+            <a class="nav-link" href="/BoxOfficePredictor">Box Office Predictor</a>
+            <a class="nav-link" href="/AwardsPredictor">Awards Predictor</a>
+          </div>
+          <ul class="navbar-nav ms-auto">
+            {% if username %}
+              <li class="nav-item"><span class="nav-link text-dark">Hello, <strong>{{ username }}</strong></span></li>
+              <li class="nav-item"><a class="nav-link" href="/logout">Log out</a></li>
+            {% else %}
+              <a class="nav-link" href="/login">Log in</a>
+            {% endif %}
+          </ul>
         </div>
-            <img src="../static/frontpage_pic.jpg" height="450" width="750"/>
-            <h1 style="text-align: center; font-size: 55px;">Movie Statistics Predictor</h1>
-            <h5 style="text-align: center;">Search, update and analyze film records.</h5>
-            <hr>
-            <h2>How to Use</h2>
-            <p> 
-                To use the basic functions, click on the update records tab in the navigation bar, then find the form with the
-                action you would like to perform. If you would like to insert a new movie, fill out the insert movie form. If 
-                you would like to update a movie, fill out the update movie form. If you would like to remove a movie, fill
-                out the remove movie form. You must fill in the required fields in order for the movie to be inserted, 
-                updated, or removed.
-            </p>
-            <p>
-                To use the box office predictor, click on the box office predictor tab in the navigation bar. Then, fill out
-                the form with the information you wish to input and click the predict button. 
-            </p>
-        </div>
-    </body>
+      </div>
+    </nav>
+  </div>
+  <img src="../static/frontpage_pic.jpg" class="hero-img" alt="Film reels" />
+  <h1 class="main-title">Movie Statistics Predictor</h1>
+  <h5 class="subtitle">Search, update and analyze film records.</h5>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">How to Use</h2>
+
+  <div class="highlight-grid">
+    <div class="hl">
+      <div class="num">1</div>
+      <div>
+        <h4>Choose an Action</h4>
+        <p>Select the action you would like to perform from the navigation bar. Search Records, Update Records, or Prediction tools.</p>
+      </div>
+    </div>
+
+    <div class="hl">
+      <div class="num">2</div>
+      <div>
+        <h4>Fill Out the Appropriate Form</h4>
+        <p>Depending on the task, complete the required fields. Insert, update, remove, or provide prediction inputs.</p>
+      </div>
+    </div>
+
+    <div class="hl">
+      <div class="num">3</div>
+      <div>
+        <h4>Submit & Review</h4>
+        <p>Click the action button to generate predictions or update movie records.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
 </html>
