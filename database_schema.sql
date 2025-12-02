@@ -145,6 +145,7 @@ DROP PROCEDURE IF EXISTS averageForeignRevenue;
 -- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
 -- returns average revenue from those movies and count of movies used in the calculation
 DELIMITER $$
+
 CREATE PROCEDURE averageForeignRevenue(IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255),
                                            IN input_year INT, IN input_quarter_start INT, IN input_quarter_end INT, 
                                            OUT avg_revenue FLOAT, OUT movie_count FLOAT)
@@ -197,19 +198,41 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS averageAwardPerformance;
 
 DELIMITER $$
+
 CREATE PROCEDURE averageAwardPerformance(
     IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255), IN input_year INT,
     OUT avg_awards FLOAT
 )
 BEGIN
-    SELECT IFNULL(AVG(MA.movie_awards), 0)
+    SELECT IFNULL(AVG(sub.movie_awards * 1.0), 0)
     INTO avg_awards
-    FROM MovieStatistics M
-    LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
-    LEFT JOIN DirectorsAndActors DA ON DA.member_id = MA.member_id
-    WHERE YEAR(M.release_date) = input_year
-      AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
-      AND (input_actor = '' OR (DA.roll_type='ACTOR' AND DA.member_name LIKE CONCAT('%', input_actor, '%')))
-      AND (input_director = '' OR (DA.roll_type='DIRECTOR' AND DA.member_name LIKE CONCAT('%', input_director, '%')));
+    FROM (SELECT DISTINCT MA.movie_awards
+          FROM MovieStatistics M
+          JOIN MembersAndAwards MA ON MA.movie_id = M.id
+          WHERE (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
+          
+            AND (
+                input_actor = '' OR 
+                EXISTS (
+                    SELECT 1 
+                    FROM DirectorsAndActors DA1
+                    WHERE DA1.member_id = MA.member_id
+                      AND DA1.roll_type = 'ACTOR'
+                      AND DA1.member_name LIKE CONCAT('%', input_actor, '%')
+                )
+            )
+
+            AND (
+                input_director = '' OR 
+                EXISTS (
+                    SELECT 1 
+                    FROM DirectorsAndActors DA2
+                    WHERE DA2.member_id = MA.member_id
+                      AND DA2.roll_type = 'DIRECTOR'
+                      AND DA2.member_name LIKE CONCAT('%', input_director, '%')
+                )
+            )
+    ) AS sub;
 END$$
+
 DELIMITER ;

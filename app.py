@@ -354,6 +354,7 @@ def AwardsPredictor():
 
 @app.route("/predict-awards", methods=['POST'])
 def Predictawards():
+    title = request.form["title"]
     genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")

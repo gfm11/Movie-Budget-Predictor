@@ -114,7 +114,6 @@ def calculate_foreign_box_office(db, genre, actor, director, release):
             num_movies = float(retvals[7])
             print("NUMBER OF MOVIES: ", num_movies)
             
-        # find tickets sold for the year and add to total
         tickets_sold = avg_revenue / ticket_prices[i]
         total_tickets_sold_weighted += tickets_sold * weight
         total_movies_matched_weighted += num_movies * weight
@@ -132,65 +131,111 @@ def calculate_foreign_box_office(db, genre, actor, director, release):
 
     return projected_box_office
 
-def calculate_award_percentage(db, genre, actor, director, release):
 
-    quarter_weights = {
-        "Q1": 0.85, "Q2": 1.00, "Q3": 1.15, "Q4": 1.30   
-    }
+def compute_similarity(new_genre, new_actor, new_director, row):
+    score = 0
 
-    quarter_weight = quarter_weights.get(release, 1.0)
+    if new_genre in (row["genres"] or ""):
+        score += 2
 
-    all_awards = 0
+    if row["actors"] and new_actor in row["actors"].split(','):
+        score += 3
 
-    for i in range(26):
+    if row["directors"] and new_director in row["directors"].split(','):
+        score += 3
 
-        weight_fullmatch = 1.0 + (i / 25) * 1.5
+    return score
 
-        cursor_actor = db.cursor(buffered=True)
-        ActorQuery = "SELECT IFNULL(SUM(member_awards), 0) FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
-        cursor_actor.execute(ActorQuery, (actor,))
-        actor_awards = cursor_actor.fetchone()[0]
-        cursor_actor.close()
+def knn_predict_awards(db, genre, actor, director, k):
+    cursor = db.cursor(dictionary=True)
 
-        cursor_director = db.cursor(buffered=True)
-        DirectorQuery = "SELECT IFNULL(SUM(member_awards), 0) FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'"
-        cursor_director.execute(DirectorQuery, (director,))
-        director_awards = cursor_director.fetchone()[0]
-        cursor_director.close()
+    cursor.execute("""
+        SELECT 
+            ms.id AS movie_id,
+            ms.genres,
+            GROUP_CONCAT(CASE WHEN da.roll_type = 'ACTOR' THEN da.member_name END SEPARATOR ',') AS actors,
+            GROUP_CONCAT(CASE WHEN da.roll_type = 'DIRECTOR' THEN da.member_name END SEPARATOR ',') AS directors,
+            MAX(ma.movie_awards) AS awards
+        FROM MovieStatistics ms
+        LEFT JOIN MembersAndAwards ma ON ms.id = ma.movie_id
+        LEFT JOIN DirectorsAndActors da ON ma.member_id = da.member_id
+        GROUP BY ms.id
+    """)
 
-        if actor_awards > director_awards:
-            weight_actor = 1.0 + (i / 25) * 1.2
-            weight_director = 1.0 + (i / 25)
-        else:
-            weight_actor = 1.0 + (i / 25)
-            weight_director = 1.0 + (i / 25) * 1.2
-
-        cursor = db.cursor(buffered=True)
-        values = [actor, director, genre, 2000 + i, 0]
-        projected_Awards = cursor.callproc('averageAwardPerformance', values)
-
-        avg_awards = float(projected_Awards[4]) if projected_Awards[4] else 0.0
-
-        values_actor = [actor, "", genre, 2000 + i, 0]
-        projected_Awards_actor = cursor.callproc('averageAwardPerformance', values_actor)
-
-        avg_awards_actor = float(projected_Awards_actor[4]) if projected_Awards_actor[4] else 0.0
-
-        values_director = ["", director, genre, 2000 + i, 0]
-        projected_Awards_director = cursor.callproc('averageAwardPerformance', values_director)
-
-        avg_awards_director = float(projected_Awards_director[4]) if projected_Awards_director[4] else 0.0
-        cursor.close()
-
-        combined = ((avg_awards * weight_fullmatch + avg_awards_actor * weight_actor + avg_awards_director * weight_director) / 3) * quarter_weight
-
-        all_awards += combined
-
-    cursor = db.cursor(buffered=True)
-    cursor.execute("SELECT MAX(movie_awards) FROM MembersAndAwards")
-    max_awards = cursor.fetchone()[0] or 1
+    rows = cursor.fetchall()
     cursor.close()
 
-    percentage = min(100, (all_awards / max_awards) * 100)
+    scored = []
+    for r in rows:
+        sim = compute_similarity(genre, actor, director, r)
+        scored.append((sim, r["awards"] or 0))
 
+    scored.sort(reverse=True, key=lambda x: x[0])
+
+    top = [x for x in scored if x[0] > 0][:k]
+
+    if not top:
+        return 0
+
+    total_sim = sum(s for s, _ in top)
+    knn_score = sum(s * a for s, a in top) / total_sim
+    return knn_score
+
+
+def calculate_award_percentage(db, genre, actor, director, release):
+
+    quarter_weights = {"Q1":0.85,"Q2":1.0,"Q3":1.15,"Q4":1.30}
+    quarter_weight = quarter_weights.get(release, 1.0)
+
+    weight_fullmatch = 1.5
+
+    cursor = db.cursor(buffered=True)
+
+    cursor.execute("SELECT IFNULL(SUM(member_awards), 0) FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'", (actor,))
+    actor_awards = cursor.fetchone()[0]
+
+    cursor.execute("SELECT IFNULL(SUM(member_awards), 0) FROM DirectorsAndActors WHERE member_name=%s AND roll_type='DIRECTOR'", (director,))
+    director_awards = cursor.fetchone()[0]
+
+    if actor_awards > director_awards:
+        weight_actor = 1.2
+        weight_director = 1.0
+    else:
+        weight_actor = 1.0 
+        weight_director = 1.2
+
+    values = [actor, director, genre, 0, 0]
+    projected_Awards = cursor.callproc('averageAwardPerformance', values)
+    avg_awards = float(projected_Awards[4]) if projected_Awards[4] else 0.0
+
+    cursor.execute("""SELECT AVG(MA.movie_awards) 
+                    FROM MembersAndAwards MA JOIN DirectorsAndActors DA ON DA.member_id = MA.member_id
+                    WHERE DA.member_name = %s  AND DA.roll_type = 'ACTOR'""", (actor,))
+    row = cursor.fetchone()
+    avg_awards_actor = float(row[0]) if row and row[0] is not None else 0.0
+
+    cursor.execute("""SELECT AVG(MA.movie_awards)
+                    FROM MembersAndAwards MA JOIN DirectorsAndActors DA ON DA.member_id = MA.member_id
+                    WHERE DA.member_name = %s AND DA.roll_type = 'DIRECTOR'""", (director,))
+    row = cursor.fetchone()
+    avg_awards_director = float(row[0]) if row and row[0] is not None else 0.0
+
+    cursor.close()
+
+    combined = (
+        avg_awards * weight_fullmatch +
+        avg_awards_actor * weight_actor +
+        avg_awards_director * weight_director
+    ) / 3.0
+
+    all_awards = combined + float(actor_awards) + float(director_awards)
+
+    knn_estimate = knn_predict_awards(db, genre, actor, director, k=5)
+
+    final_awards = (all_awards * 0.70) + (knn_estimate * 0.30)
+    final_awards *= quarter_weight
+
+    percentage = (final_awards / 163) * 100
+    if percentage > 100:
+        percentage = 99.6
     return round(percentage, 2)

@@ -126,10 +126,11 @@
                     <option value="Q2">Q2</option>
                     <option value="Q3">Q3</option>
                     <option value="Q4">Q4</option>
+                </select>
                 <input type="submit" value="Predict">
             </fieldset>
         </form>
-        {% if Awards_percentage %}
+        {% if Awards_percentage is not none %}
             <h3 style="text-align: center;">Predicted Awards Likleyhood: </br> {{Awards_percentage}} %</h3>
         {% endif %}
     </main>
