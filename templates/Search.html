@@ -1,109 +1,205 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Search Movies</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Movies</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #EDE7DD;
+      --cream: #F7F3EF;
+      --text: #3E3A31;
+      --muted:#5A564D;
+      --sage:#6D8A6E;
+      --border-sage:rgba(109,138,110,0.35);
+      --terracotta:#B45F4F;
+      --radius:12px;
+    }
+
+    body{
+      background:var(--bg);
+      font-family:Inter, sans-serif;
+      color:var(--text);
+      padding-bottom:40px;
+    }
+
+    .navbar{
+      background:var(--cream) !important;
+      border-bottom:1px solid #D8CFC4;
+      padding:12px 0;
+    }
+    .navbar .nav-link{
+      padding:8px 14px;
+      border-radius:8px;
+      font-weight:500;
+      color:var(--text) !important;
+      transition:background .22s ease,color .22s ease;
+    }
+    .navbar .nav-link:hover{
+      background:var(--sage);
+      color:white !important;
+    }
+
+    h1{
+      text-align:center;
+      margin-top:30px;
+      margin-bottom:6px;
+      font-weight:700;
+    }
+
+    .divider{
+      height:1px;
+      max-width:800px;
+      margin:20px auto 40px;
+      background:linear-gradient(to right, rgba(109,138,110,0), rgba(109,138,110,0.3), rgba(109,138,110,0));
+    }
+
+    .search-card{
+      max-width:460px;
+      margin:0 auto 40px auto;
+      background:white;
+      border:1px solid var(--border-sage);
+      border-radius:var(--radius);
+      padding:30px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+    }
+    legend{
+      font-size:20px;
+      font-weight:600;
+      padding-bottom:6px;
+    }
+    label{
+      margin-top:10px;
+      font-weight:500;
+    }
+    input[type="text"]{
+      width:100%;
+      padding:8px 10px;
+      border-radius:6px;
+      border:1px solid #CFCAC3;
+      margin-bottom:14px;
+    }
+
+    .btn-sage{
+      background:var(--sage);
+      color:white;
+      border:none;
+      padding:10px;
+      border-radius:6px;
+      width:100%;
+      transition:opacity .2s ease;
+    }
+    .btn-sage:hover{opacity:.88;}
+
+    .results-wrapper{
+      max-width:95%;
+      margin:20px auto;
+      background:white;
+      padding:20px;
+      border-radius:var(--radius);
+      border:1px solid var(--border-sage);
+      box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    }
+
+    table{
+      background:white !important;
+    }
+
+  </style>
 </head>
-<style>
-</style>
+
 <body>
-    <div class = "container">
-            <nav class="navbar navbar-expand-lg" style="background-color:rgba(203, 205, 207, 0.6);">
-                <div class="container-fluid">
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="/update">Update Records</a>
-                        <a class="nav-link active" aria-current="page" href="/BoxOfficePredictor">Box Office Predictor</a>
-                        <a class="nav-link active" aria-current="page" href="/AwardsPredictor">Awards Predictor</a>
-                        <a class="nav-link active" aria-current="page" href="/">Homepage</a>
-                        <ul class="navbar-nav ms-auto">
-                            {% if username %}
-                                <li class="nav-item">
-                                    <span class="nav-link text-dark">
-                                        Hello, <strong>{{ username }}</strong>
-                                    </span>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/logout">Log out</a>
-                                </li>
-                            {% else %}
-                                <a class="nav-link active" aria-current="page" href="/login">Log in</a>
-                            {% endif %}
-                        </ul>                    
-                    </div>
-                </div>
-                </div>
-            </nav>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link" href="/update">Update Records</a>
+            <a class="nav-link" href="/BoxOfficePredictor">Box Office Predictor</a>
+            <a class="nav-link" href="/AwardsPredictor">Awards Predictor</a>
+            <a class="nav-link" href="/">Homepage</a>
+          </div>
+          <ul class="navbar-nav ms-auto">
+            {% if username %}
+              <li class="nav-item"><span class="nav-link text-dark">Hello, <strong>{{ username }}</strong></span></li>
+              <li class="nav-item"><a class="nav-link" href="/logout">Log out</a></li>
+            {% else %}
+              <a class="nav-link" href="/login">Log in</a>
+            {% endif %}
+          </ul>
         </div>
-    <header>
-        <h1 style="text-align: center;">Search Movies</h1>
-    </header>
-    <main style="width: 400px; margin: auto;">
-        <form action="/search-results" method="POST" style="margin-bottom: 20px;">
-            <fieldset style="padding: 10px;">
-                <legend>Search/Filter Movie</legend>
-                <label style="display:inline-block; width:100px;">Title:</label>
-                <input type="text" name="title"><br>
+      </div>
+    </nav>
+  </div>
 
-                <label style="display:inline-block; width:100px;">Genre:</label>
-                <input type="text" name="genre"><br>
+  <h1>Search Movies</h1>
+  <div class="divider"></div>
 
-                <label style="display:inline-block; width:100px;">Actor:</label>
-                <input type="text" name="actor"><br>
+  <form action="/search-results" method="POST" class="search-card">
+    <fieldset>
+      <legend>Search / Filter Movie</legend>
 
-                <label style="display:inline-block; width:100px;">Director:</label>
-                <input type="text" name="director"><br>
+      <label>Title:</label>
+      <input type="text" name="title">
 
-                <input type="submit" value="Search">
-            </fieldset>
-        </form>
+      <label>Genre:</label>
+      <input type="text" name="genre">
 
-        {% if results %}
-        <h3>Search Results:</h3>
-        <div style="display: flex; justify-content: center; margin-top: 10px;">
-        <table class="table table-striped" style="text-align:center; width: 90%; max-width: 1200px;">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Genre</th>
-                    <th>Actors</th>
-                    <th>Directors</th>
-                    <th>Movie Status</th>
-                    <th>Release Date</th>
-                    <th>Adult</th>
-                    <th>Movie Rank</th>
-                    <th>Worldwide Revenue</th>
-                    <th>Domestic Revenue</th>
-                    <th>Domestic Percentage</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in results %}
-                <tr>
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[1] }}</td>
-                    <td>{{ row[2] if row[2] else 'No Actors Found' }}</td>
-                    <td>{{ row[3] if row[3] else 'No Directors Found' }}</td>
-                    <td>{{ row[4] }}</td>
-                    <td>{{ row[5] }}</td>
-                    <td>{{ row[6] }}</td>
-                    <td>{{ row[7] }}</td>
-                    <td>{{ row[8] }}</td>
-                    <td>{{ row[9] }}</td>
-                    <td>{{ row[10] }}</td>
-                    <td>{{ row[11] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% elif results is not none %}
-        <p>No results found.</p>
-    {% endif %}
+      <label>Actor:</label>
+      <input type="text" name="actor">
+
+      <label>Director:</label>
+      <input type="text" name="director">
+
+      <button type="submit" class="btn-sage">Search</button>
+    </fieldset>
+  </form>
+
+  {% if results %}
+    <div class="results-wrapper">
+      <h3 style="text-align:center; margin-bottom:20px;">Search Results</h3>
+      <table class="table table-striped text-center">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Actors</th>
+            <th>Directors</th>
+            <th>Movie Status</th>
+            <th>Release Date</th>
+            <th>Adult</th>
+            <th>Movie Rank</th>
+            <th>Worldwide Revenue</th>
+            <th>Domestic Revenue</th>
+            <th>Domestic %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results %}
+          <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] if row[2] else 'No Actors Found' }}</td>
+            <td>{{ row[3] if row[3] else 'No Directors Found' }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
+            <td>{{ row[8] }}</td>
+            <td>{{ row[9] }}</td>
+            <td>{{ row[10] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
-    </main>
+  {% elif results is not none %}
+    <p style="text-align:center;">No results found.</p>
+  {% endif %}
+
 </body>
-
 </html>
-
