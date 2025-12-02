@@ -140,7 +140,7 @@ def calculate_foreign_box_office(db, genre, actor, director, release):
     return projected_box_office
 
 
-def compute_similarity(new_genre, new_actor, new_director, row):
+def movie_similarity(new_genre, new_actor, new_director, row):
     score = 0
 
     if new_genre in (row["genres"] or ""):
@@ -175,7 +175,7 @@ def knn_predict_awards(db, genre, actor, director, k):
 
     scored = []
     for r in rows:
-        sim = compute_similarity(genre, actor, director, r)
+        sim = movie_similarity(genre, actor, director, r)
         scored.append((sim, r["awards"] or 0))
 
     scored.sort(reverse=True, key=lambda x: x[0])
