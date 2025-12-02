@@ -1,138 +1,266 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Awards Predictor</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    </head>
-    <style>
-    </style>
-    <body>
-        <div class = "container">
-            <nav class="navbar navbar-expand-lg" style="background-color:rgba(203, 205, 207, 0.6);">
-                <div class="container-fluid">
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="/search">Search Records</a>
-                        <a class="nav-link active" aria-current="page" href="/update">Update Records</a>
-                        <a class="nav-link active" aria-current="page" href="/BoxOfficePredictor">Box Office Predictor</a>
-                        <a class="nav-link active" aria-current="page" href="/">Homepage</a>
-                        <ul class="navbar-nav ms-auto">
-                            {% if username %}
-                                <li class="nav-item">
-                                    <span class="nav-link text-dark">
-                                        Hello, <strong>{{ username }}</strong>
-                                    </span>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/logout">Log out</a>
-                                </li>
-                            {% else %}
-                                <a class="nav-link active" aria-current="page" href="/login">Log in</a>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-                </div>
-            </nav>
-        </div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div 
-                        style="margin: 10px auto; width: 400px; padding: 10px; border-radius: 5px;
-                            color: white; text-align: center;
-                        background-color: {% if category == 'error' %} #dc3545 {% elif category == 'success' %}#28a745{% else %}#007bff{% endif %};">
-                    {{ message }}
-                    </div>
-                {% endfor %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Awards Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #EDE7DD;
+      --cream: #F7F3EF;
+      --text: #3E3A31;
+      --muted:#5A564D;
+      --sage:#6D8A6E;
+      --border-sage:rgba(109,138,110,0.35);
+      --terracotta:#B45F4F;
+      --radius:12px;
+    }
+
+    body{
+      background:var(--bg);
+      font-family:Inter, sans-serif;
+      color:var(--text);
+      padding-bottom:40px;
+    }
+
+    .navbar{
+      background:var(--cream) !important;
+      border-bottom:1px solid #D8CFC4;
+      padding:12px 0;
+    }
+    .navbar .nav-link{
+      padding:8px 14px;
+      border-radius:8px;
+      font-weight:500;
+      color:var(--text) !important;
+      transition:background .22s ease,color .22s ease;
+    }
+    .navbar .nav-link:hover{
+      background:var(--sage);
+      color:white !important;
+    }
+
+    h1{
+      text-align:center;
+      margin-top:30px;
+      margin-bottom:6px;
+      font-weight:700;
+    }
+
+    .divider{
+      height:1px;
+      max-width:800px;
+      margin:20px auto 40px;
+      background:linear-gradient(to right, rgba(109,138,110,0), rgba(109,138,110,0.3), rgba(109,138,110,0));
+    }
+
+    .form-card{
+      max-width:460px;
+      margin:0 auto 40px auto;
+      background:white;
+      border:1px solid var(--border-sage);
+      border-radius:var(--radius);
+      padding:30px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+    }
+    legend{
+      font-size:20px;
+      font-weight:600;
+      padding-bottom:6px;
+    }
+    label{
+      margin-top:10px;
+      font-weight:500;
+      display:block;
+    }
+    input[type="text"], select{
+      width:100%;
+      padding:8px 10px;
+      border-radius:6px;
+      border:1px solid #CFCAC3;
+      margin-bottom:14px;
+      font-family:Inter, sans-serif;
+    }
+
+    input[type="submit"]{
+      background:var(--sage);
+      color:white;
+      border:none;
+      padding:10px;
+      border-radius:6px;
+      width:100%;
+      transition:opacity .2s ease;
+      cursor:pointer;
+      font-weight:500;
+      margin-top:10px;
+    }
+    input[type="submit"]:hover{opacity:.88;}
+
+    .flash-box{
+      margin: 10px auto;
+      max-width: 460px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align:center;
+      color:white;
+      font-weight:500;
+    }
+    .flash-success{background: var(--sage);}
+    .flash-error{background: var(--terracotta);}
+    .flash-info{background: #8C7F75;}
+
+    .result-card{
+      max-width:460px;
+      margin:0 auto;
+      background:white;
+      border:1px solid var(--border-sage);
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      text-align:center;
+    }
+    .result-card h3{
+      font-size:18px;
+      font-weight:600;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .result-card .percentage{
+      font-size:42px;
+      font-weight:700;
+      color:var(--sage);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link" href="/search">Search Records</a>
+            <a class="nav-link" href="/update">Update Records</a>
+            <a class="nav-link" href="/BoxOfficePredictor">Box Office Predictor</a>
+            <a class="nav-link" href="/">Homepage</a>
+          </div>
+          <ul class="navbar-nav ms-auto">
+            {% if username %}
+              <li class="nav-item"><span class="nav-link text-dark">Hello, <strong>{{ username }}</strong></span></li>
+              <li class="nav-item"><a class="nav-link" href="/logout">Log out</a></li>
+            {% else %}
+              <a class="nav-link" href="/login">Log in</a>
             {% endif %}
-    {% endwith %}
-    <main style="width: 400px; margin: auto;">
-        <form action= "/predict-awards" method="POST" style="margin-bottom: 20px;">
-            <fieldset style="padding: 10px;">
-                <legend>Awards Predictor</legend>
-                <label style="display:inline-block; width:100px;">Title:</label>
-                <input type="text" name="title"><br>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
 
-                <label style="display:inline-block; width:100px;">Genre:</label>
-                <select name="genre" id="genres">
-                    <option value="Horror">Horror</option>
-                    <option value="Drama">Drama</option>
-                    <option value="Crime">Crime</option>
-                    <option value="Family">Family</option>
-                    <option value="Animation">Animation</option>
-                    <option value="Science Fiction">Science Fiction</option>
-                    <option value="Action">Action</option>
-                    <option value="Thriller">Thriller</option>
-                    <option value="Mystery">Mystery</option>
-                    <option value="Fantasy">Fantasy</option>
-                    <option value="Western">Western</option>
-                    <option value="Thriller">Family</option>
-                    <option value="Documentary">Documentary</option>
-                    <option value="Adventure">Adventure</option>
-                    <option value="War">War</option>
-                    <option value="History">History</option>
-                    <option value="Romance">Romance</option>
-                    <option value="Comedy">Comedy</option>
-                    <option value="Music">Music</option>
-                </select>
-                <br>
-                <label style="display:inline-block; width:100px;">Actor:</label>
-                <input list="actor" name="actor">
-                <datalist id="actor">
-                    <option value="Leonardo DiCaprio">
-                    <option value="Joseph Gordon-Levitt">
-                    <option value="Elliot Page">
-                    <option value="Matthew McConaughey">
-                    <option value="Anne Hathaway">
-                    <option value="Jessica Chastain">
-                    <option value="Christian Bale">
-                    <option value="Heath Ledger">
-                    <option value="Aaron Eckhart">
-                    <option value="Sam Worthington">
-                    <option value="Sigourney Weaver">
-                    <option value="Robert Downey Jr.">
-                    <option value="Chris Evans">
-                    <option value="Scarlett Johansson">
-                    <option value="Ryan Reynolds">
-                    <option value="Morena Baccarin">
-                    <option value="T. J. Miller">
-                    <option value="Chris Hemsworth">
-                    <option value="Chris Pratt">
-                    <option value="Bradley Cooper">
-                    <option value="Daniel Radcliffe">
-                    <option value="Rupert Grint">
-                    <option value="Emma Watson">
-                    <option value="Gwyneth Paltrow">
-                    <option value="Terrence Howard">
-                </datalist>
+  <h1>Awards Predictor</h1>
+  <div class="divider"></div>
 
-                <label style="display:inline-block; width:100px;">Director:</label>
-                <input list="director" name="director">
-                <datalist id="director">
-                    <option value="Christopher Nolan">
-                    <option value="James Cameron">
-                    <option value="Joss Whedon">
-                    <option value="Tim Miller">
-                    <option value="Anthony Russo">
-                    <option value="Joe Russo">
-                    <option value="James Gunn">
-                    <option value="Chris Columbus">
-                    <option value="Jon Favreau">
-                </datalist>
-                <label style="display:inline-block; width:100px;">Release:</label>
-                <select name="release" id="release">
-                    <option value="Q1">Q1</option>
-                    <option value="Q2">Q2</option>
-                    <option value="Q3">Q3</option>
-                    <option value="Q4">Q4</option>
-                </select>
-                <input type="submit" value="Predict">
-            </fieldset>
-        </form>
-        {% if Awards_percentage is not none %}
-            <h3 style="text-align: center;">Predicted Awards Likleyhood: </br> {{Awards_percentage}} %</h3>
-        {% endif %}
-    </main>
-    </body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-box {% if category=='success' %}flash-success{% elif category=='error' %}flash-error{% else %}flash-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form action="/predict-awards" method="POST" class="form-card">
+    <fieldset>
+      <legend>Predict Awards Likelihood</legend>
+
+      <label>Genre:</label>
+      <select name="genre" id="genres">
+        <option value="Horror">Horror</option>
+        <option value="Drama">Drama</option>
+        <option value="Crime">Crime</option>
+        <option value="Family">Family</option>
+        <option value="Animation">Animation</option>
+        <option value="Science Fiction">Science Fiction</option>
+        <option value="Action">Action</option>
+        <option value="Thriller">Thriller</option>
+        <option value="Mystery">Mystery</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="Western">Western</option>
+        <option value="Documentary">Documentary</option>
+        <option value="Adventure">Adventure</option>
+        <option value="War">War</option>
+        <option value="History">History</option>
+        <option value="Romance">Romance</option>
+        <option value="Comedy">Comedy</option>
+        <option value="Music">Music</option>
+      </select>
+
+      <label>Actor:</label>
+      <input list="actor" name="actor">
+      <datalist id="actor">
+        <option value="Leonardo DiCaprio">
+        <option value="Joseph Gordon-Levitt">
+        <option value="Elliot Page">
+        <option value="Matthew McConaughey">
+        <option value="Anne Hathaway">
+        <option value="Jessica Chastain">
+        <option value="Christian Bale">
+        <option value="Heath Ledger">
+        <option value="Aaron Eckhart">
+        <option value="Sam Worthington">
+        <option value="Sigourney Weaver">
+        <option value="Robert Downey Jr.">
+        <option value="Chris Evans">
+        <option value="Scarlett Johansson">
+        <option value="Ryan Reynolds">
+        <option value="Morena Baccarin">
+        <option value="T. J. Miller">
+        <option value="Chris Hemsworth">
+        <option value="Chris Pratt">
+        <option value="Bradley Cooper">
+        <option value="Daniel Radcliffe">
+        <option value="Rupert Grint">
+        <option value="Emma Watson">
+        <option value="Gwyneth Paltrow">
+        <option value="Terrence Howard">
+      </datalist>
+
+      <label>Director:</label>
+      <input list="director" name="director">
+      <datalist id="director">
+        <option value="Christopher Nolan">
+        <option value="James Cameron">
+        <option value="Joss Whedon">
+        <option value="Tim Miller">
+        <option value="Anthony Russo">
+        <option value="Joe Russo">
+        <option value="James Gunn">
+        <option value="Chris Columbus">
+        <option value="Jon Favreau">
+      </datalist>
+
+      <label>Release Quarter:</label>
+      <select name="release" id="release">
+        <option value="Q1">Q1</option>
+        <option value="Q2">Q2</option>
+        <option value="Q3">Q3</option>
+        <option value="Q4">Q4</option>
+      </select>
+
+      <input type="submit" value="Predict">
+    </fieldset>
+  </form>
+
+  {% if Awards_percentage is not none %}
+    <div class="result-card">
+      <h3>Predicted Awards Likelihood</h3>
+      <div class="percentage">{{ Awards_percentage }}%</div>
+    </div>
+  {% endif %}
+
+</body>
 </html>

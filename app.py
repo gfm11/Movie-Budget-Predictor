@@ -353,7 +353,6 @@ def AwardsPredictor():
 
 @app.route("/predict-awards", methods=['POST'])
 def Predictawards():
-    title = request.form["title"]
     genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")
@@ -373,9 +372,11 @@ def Predictawards():
     
     if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
+        return render_template('AwardsPredictor.html')
 
     if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
+        return render_template('AwardsPredictor.html')
 
     percentage_of_awards = advancedFunctions.calculate_award_percentage(db, genre, actor, director, release)
 
