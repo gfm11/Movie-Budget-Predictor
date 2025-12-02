@@ -56,7 +56,11 @@ def calculate_national_box_office(db, genre, actor, director, release):
         
 
         cursor_avg_revenue.close()
-    
+
+    # return -1 if no movies could be matched
+    if total_movies_matched_weighted <= 0:
+        return -1
+
     # calculate projected box office
     tickets_per_movie = total_tickets_sold_weighted / total_movies_matched_weighted
     projected_box_office = int(tickets_per_movie * ticket_prices[24])
@@ -121,6 +125,10 @@ def calculate_foreign_box_office(db, genre, actor, director, release):
 
         cursor_avg_revenue.close()
     
+    # return -1 if no movies could be matched
+    if total_movies_matched_weighted <= 0:
+        return -1
+
     # calculate projected box office
     tickets_per_movie = total_tickets_sold_weighted / total_movies_matched_weighted
     projected_box_office = int(tickets_per_movie * ticket_prices[24])
