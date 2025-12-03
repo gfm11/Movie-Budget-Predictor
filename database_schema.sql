@@ -111,8 +111,11 @@ BEGIN
         WHERE YEAR(M.release_date) = input_year
         AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
         AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
-        AND (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-        AND (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        AND (
+            (input_actor = '' AND input_director = '')
+            OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
+            OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        )
     ) AS unique_movies;
 
     SELECT IFNULL(COUNT(*), 0)
@@ -132,8 +135,11 @@ BEGIN
         WHERE YEAR(M.release_date) = input_year
         AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
         AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
-        AND (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-        AND (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        AND (
+            (input_actor = '' AND input_director = '')
+            OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
+            OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        )
     ) AS unique_movies_count;
 END$$
 
@@ -167,8 +173,11 @@ BEGIN
         WHERE YEAR(M.release_date) = input_year
         AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
         AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
-        AND (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-        AND (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        AND (
+            (input_actor = '' AND input_director = '')
+            OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
+            OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        )
     ) AS unique_movies;
 
     SELECT IFNULL(COUNT(*), 0)
@@ -188,8 +197,11 @@ BEGIN
         WHERE YEAR(M.release_date) = input_year
         AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
         AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
-        AND (input_actor = '' OR DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-        AND (input_director = '' OR DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        AND (
+            (input_actor = '' AND input_director = '')
+            OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
+            OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
+        )
     ) AS unique_movies_count;
 END$$
 
