@@ -1,30 +1,148 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Log in</title>
-    </head>
-  <body>
-    <header>
-        <h1 style="text-align: center;">Log In/ Create Account</h1>
-    </header>
-    <main style="width: 400px; margin: auto;">
-        <form action="/login-status" method="POST" style="margin-bottom: 20px;">
-            <fieldset style="padding: 10px;">
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log in</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-              <legend>Log In / Create Account</legend>
+  <style>
+    :root{
+      --bg: #EDE7DD;
+      --cream: #F7F3EF;
+      --text: #3E3A31;
+      --muted:#5A564D;
+      --sage:#6D8A6E;
+      --border-sage:rgba(109,138,110,0.35);
+      --terracotta:#B45F4F;
+      --radius:12px;
+    }
 
-                <label style="display:inline-block; width:100px;">Username:</label>
-                <input type="text" name="username" required><br>
+    body{
+      background:var(--bg);
+      font-family:Inter, sans-serif;
+      color:var(--text);
+      padding-bottom:40px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      margin:0;
+    }
 
-                <label style="display:inline-block; width:100px;">Password:</label>
-                <input type="password" name="password" required><br>
+    h1{
+      text-align:center;
+      margin-bottom:6px;
+      font-weight:700;
+      font-size:32px;
+    }
 
-                <input type="submit" name="action" value="Log In">
-                <input type="submit" name="action" value="Create Account">
-            </fieldset>
-        </form>
-        {% if message %}
-          <p>{{ message }}</p>
-        {% endif %}
-  </body>
+    .divider{
+      height:1px;
+      max-width:400px;
+      width:100%;
+      margin:20px auto 40px;
+      background:linear-gradient(to right, rgba(109,138,110,0), rgba(109,138,110,0.3), rgba(109,138,110,0));
+    }
+
+    .login-card{
+      max-width:420px;
+      width:100%;
+      margin:0 auto;
+      background:white;
+      border:1px solid var(--border-sage);
+      border-radius:var(--radius);
+      padding:30px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    legend{
+      font-size:20px;
+      font-weight:600;
+      padding-bottom:6px;
+    }
+
+    label{
+      margin-top:10px;
+      font-weight:500;
+      display:block;
+    }
+
+    input[type="text"], input[type="password"]{
+      width:100%;
+      padding:8px 10px;
+      border-radius:6px;
+      border:1px solid #CFCAC3;
+      margin-bottom:14px;
+      font-family:Inter, sans-serif;
+    }
+
+    .button-group{
+      display:flex;
+      gap:10px;
+      margin-top:20px;
+    }
+
+    input[type="submit"]{
+      background:var(--sage);
+      color:white;
+      border:none;
+      padding:10px;
+      border-radius:6px;
+      flex:1;
+      transition:opacity .2s ease;
+      cursor:pointer;
+      font-weight:500;
+    }
+
+    input[type="submit"]:hover{
+      opacity:.88;
+    }
+
+    input[type="submit"][value="Create Account"]{
+      background:var(--muted);
+    }
+
+    .message{
+      margin-top:20px;
+      padding:12px;
+      border-radius:8px;
+      text-align:center;
+      color:white;
+      font-weight:500;
+      background:var(--terracotta);
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <h1>Log In / Create Account</h1>
+    <div class="divider"></div>
+
+    <form action="/login-status" method="POST" class="login-card">
+      <fieldset style="border:none; padding:0; margin:0;">
+        <legend>Welcome</legend>
+
+        <label>Username:</label>
+        <input type="text" name="username" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <div class="button-group">
+          <input type="submit" name="action" value="Log In">
+          <input type="submit" name="action" value="Create Account">
+        </div>
+      </fieldset>
+    </form>
+
+    {% if message %}
+      <div class="message" style="max-width:420px; width:100%;">
+        {{ message }}
+      </div>
+    {% endif %}
+  </div>
+</body>
 </html>

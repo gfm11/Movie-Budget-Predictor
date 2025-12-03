@@ -150,6 +150,10 @@ def searchResults():
     values = (f"%{title}%", f"%{genre}%", actor, f"%{actor}%", director, f"%{director}%")
     cursor.execute(searchQuery, values)
     results = cursor.fetchall()
+
+    if not results:
+        flash("No results found. Please try different search terms.", "error")
+
     return render_template('Search.html', results = results)
     
 @app.route("/update", methods=["GET"])
@@ -401,11 +405,19 @@ def Predictawards():
     
     if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
+<<<<<<< HEAD
         return render_template('AwardsPredictor.html', Awards_percentage=None, movies=movies)
 
     if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
         return render_template('AwardsPredictor.html', Awards_percentage=None, movies=movies)
+=======
+        return render_template('AwardsPredictor.html')
+
+    if(directorResult is None and not (director == "")):
+        flash("Predictor error. Invalid director name", "error")
+        return render_template('AwardsPredictor.html')
+>>>>>>> 458c87de4f74a8cfbd62f46b993a83b3d8b5b18d
 
     percentage_of_awards = advancedFunctions.calculate_award_percentage(db, genre, actor, director, release)
 
