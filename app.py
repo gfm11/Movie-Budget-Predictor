@@ -345,15 +345,47 @@ def PredictBoxOffice():
 
 @app.route("/AwardsPredictor")
 def AwardsPredictor():
-    return render_template('AwardsPredictor.html')
+    user_id = request.cookies.get("user_id")
+    cursor.execute("""
+        SELECT 
+            M.id,
+            M.title,
+            M.genres,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
+        FROM MovieStatistics M
+        JOIN UserMovies U ON M.id = U.movie_id
+        LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
+        LEFT JOIN DirectorsAndActors D ON D.member_id = MA.member_id
+        WHERE U.user_id = %s
+        GROUP BY M.id, M.title, M.genres
+    """, (user_id,))
+    movies = cursor.fetchall()
+    return render_template('AwardsPredictor.html', movies=movies)
 
 @app.route("/predict-awards", methods=['POST'])
 def Predictawards():
-    title = request.form["title"]
     genre = request.form.get("genre")
     actor = request.form.get("actor")
     director = request.form.get("director")
     release = request.form.get("release")
+
+    user_id = request.cookies.get("user_id")
+    cursor.execute("""
+        SELECT 
+            M.id,
+            M.title,
+            M.genres,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
+        FROM MovieStatistics M
+        JOIN UserMovies U ON M.id = U.movie_id
+        LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
+        LEFT JOIN DirectorsAndActors D ON D.member_id = MA.member_id
+        WHERE U.user_id = %s
+        GROUP BY M.id, M.title, M.genres
+    """, (user_id,))
+    movies = cursor.fetchall()
 
     cursor_actor = db.cursor(buffered=True)
     validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
@@ -369,13 +401,15 @@ def Predictawards():
     
     if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
+        return render_template('AwardsPredictor.html', Awards_percentage=None, movies=movies)
 
     if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
+        return render_template('AwardsPredictor.html', Awards_percentage=None, movies=movies)
 
     percentage_of_awards = advancedFunctions.calculate_award_percentage(db, genre, actor, director, release)
 
-    return render_template('AwardsPredictor.html', Awards_percentage = percentage_of_awards)
+    return render_template('AwardsPredictor.html', Awards_percentage = percentage_of_awards, movies=movies)
 
 @app.context_processor
 def inject_user():

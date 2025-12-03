@@ -51,9 +51,6 @@
         <form action= "/predict-awards" method="POST" style="margin-bottom: 20px;">
             <fieldset style="padding: 10px;">
                 <legend>Awards Predictor</legend>
-                <label style="display:inline-block; width:100px;">Title:</label>
-                <input type="text" name="title"><br>
-
                 <label style="display:inline-block; width:100px;">Genre:</label>
                 <select name="genre" id="genres">
                     <option value="Horror">Horror</option>
@@ -67,7 +64,7 @@
                     <option value="Mystery">Mystery</option>
                     <option value="Fantasy">Fantasy</option>
                     <option value="Western">Western</option>
-                    <option value="Thriller">Family</option>
+                    <option value="Family">Family</option>
                     <option value="Documentary">Documentary</option>
                     <option value="Adventure">Adventure</option>
                     <option value="War">War</option>
@@ -132,6 +129,24 @@
         </form>
         {% if Awards_percentage is not none %}
             <h3 style="text-align: center;">Predicted Awards Likleyhood: </br> {{Awards_percentage}} %</h3>
+        {% endif %}
+
+        {% if username %}
+            {% for m in movies %}
+                <div class="movie-card">
+                <div class="movie-title">{{ m[1] }}</div>
+                <div class="movie-meta">
+                    Genre: {{ m[2] }} &nbsp;&nbsp; Actors: {{ m[3] }} &nbsp;&nbsp; Directors: {{ m[4] }}
+                </div>
+
+                <form action="/predict-awards" method="POST">
+                    <input type="hidden" name="genre" value="{{ m[2] }}">
+                    <input type="hidden" name="actor" value="{{ m[3] }}">
+                    <input type="hidden" name="director" value="{{ m[4] }}">
+                    <input type="hidden" name="release" value="Q2">
+                    <button type="submit">Predict</button>
+                </form>
+            {% endfor %}
         {% endif %}
     </main>
     </body>

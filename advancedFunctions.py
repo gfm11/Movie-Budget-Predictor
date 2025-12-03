@@ -236,11 +236,15 @@ def calculate_award_percentage(db, genre, actor, director, release):
         avg_awards_director * weight_director
     ) / 3.0
 
-    all_awards = combined + float(actor_awards) + float(director_awards)
+    all_awards = combined + float(avg_awards_actor) + float(avg_awards_director)
 
     knn_estimate = knn_predict_awards(db, genre, actor, director, k=5)
 
     final_awards = (all_awards * 0.70) + (knn_estimate * 0.30)
+
+    if (final_awards == 0):
+        final_awards = float(actor_awards) + float(director_awards)
+    
     final_awards *= quarter_weight
 
     percentage = (final_awards / 163) * 100
