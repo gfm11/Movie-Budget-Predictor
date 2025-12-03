@@ -300,7 +300,23 @@ def removeMovie():
 
 @app.route("/BoxOfficePredictor")
 def BoxOfficePredictor():
-    return render_template('BoxOfficePredictor.html')
+    user_id = request.cookies.get("user_id")
+    cursor.execute("""
+        SELECT 
+            M.id,
+            M.title,
+            M.genres,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
+        FROM MovieStatistics M
+        JOIN UserMovies U ON M.id = U.movie_id
+        LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
+        LEFT JOIN DirectorsAndActors D ON D.member_id = MA.member_id
+        WHERE U.user_id = %s
+        GROUP BY M.id, M.title, M.genres
+    """, (user_id,))
+    movies = cursor.fetchall()
+    return render_template('BoxOfficePredictor.html', movies=movies)
 
 @app.route("/predict-box-office", methods=['POST'])
 def PredictBoxOffice():
@@ -308,6 +324,23 @@ def PredictBoxOffice():
     actor = request.form.get("actor")
     director = request.form.get("director")
     release = request.form.get("release")
+
+    user_id = request.cookies.get("user_id")
+    cursor.execute("""
+        SELECT 
+            M.id,
+            M.title,
+            M.genres,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'ACTOR' THEN D.member_name END SEPARATOR ', ') AS actors,
+            GROUP_CONCAT(DISTINCT CASE WHEN D.roll_type = 'DIRECTOR' THEN D.member_name END SEPARATOR ', ') AS directors
+        FROM MovieStatistics M
+        JOIN UserMovies U ON M.id = U.movie_id
+        LEFT JOIN MembersAndAwards MA ON MA.movie_id = M.id
+        LEFT JOIN DirectorsAndActors D ON D.member_id = MA.member_id
+        WHERE U.user_id = %s
+        GROUP BY M.id, M.title, M.genres
+    """, (user_id,))
+    movies = cursor.fetchall()
 
     # check if the actor is valid
     cursor_actor = db.cursor(buffered=True)
@@ -326,12 +359,12 @@ def PredictBoxOffice():
     # flash error if actor is not in the table
     if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
-        return render_template('BoxOfficePredictor.html')
+        return render_template('BoxOfficePredictor.html', movies=movies)
 
     # flash error if director is not in the table
     if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
-        return render_template('BoxOfficePredictor.html')
+        return render_template('BoxOfficePredictor.html', movies=movies)
 
     # get results from box office calculations
     print("DB connection:", db.is_connected())
@@ -343,9 +376,9 @@ def PredictBoxOffice():
     # flash error if there are no matched movies
     if(domestic_prediction == -1 or foreign_prediction == -1):
         flash("Predictor error. No data with matching fields exists.", "error")
-        return render_template('BoxOfficePredictor.html')
+        return render_template('BoxOfficePredictor.html', movies=movies)
 
-    return render_template('BoxOfficePredictor.html', domestic_value = domestic_prediction, foreign_value = foreign_prediction)
+    return render_template('BoxOfficePredictor.html', domestic_value = domestic_prediction, foreign_value = foreign_prediction, movies=movies)
 
 @app.route("/AwardsPredictor")
 def AwardsPredictor():
@@ -405,19 +438,11 @@ def Predictawards():
     
     if(actorResult is None and not(actor == "")):
         flash("Predictor error. Invalid actor name.", "error")
-<<<<<<< HEAD
         return render_template('AwardsPredictor.html', Awards_percentage=None, movies=movies)
 
     if(directorResult is None and not (director == "")):
         flash("Predictor error. Invalid director name", "error")
         return render_template('AwardsPredictor.html', Awards_percentage=None, movies=movies)
-=======
-        return render_template('AwardsPredictor.html')
-
-    if(directorResult is None and not (director == "")):
-        flash("Predictor error. Invalid director name", "error")
-        return render_template('AwardsPredictor.html')
->>>>>>> 458c87de4f74a8cfbd62f46b993a83b3d8b5b18d
 
     percentage_of_awards = advancedFunctions.calculate_award_percentage(db, genre, actor, director, release)
 

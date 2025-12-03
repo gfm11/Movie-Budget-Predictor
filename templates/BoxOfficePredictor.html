@@ -117,6 +117,43 @@
       text-align:center;
       box-shadow:0 6px 18px rgba(0,0,0,0.05);
     }
+
+    .movie-card {
+    max-width: 500px;
+    margin: 20px auto;
+    background: white;
+    border: 1px solid var(--border-sage);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  }
+
+  .movie-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .movie-meta {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .movie-card button {
+    background: var(--sage);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .movie-card button:hover {
+    opacity: 0.85;
+  }
   </style>
 </head>
 
@@ -255,6 +292,31 @@
       <p style="font-size:22px; font-weight:700;">${{foreign_value}}</p>
     </div>
   {% endif %}
+
+      {% if username %}
+        {% for m in movies %}
+            <div class="movie-card">
+
+            <div class="movie-title">{{ m[1] }}</div>
+
+            <div class="movie-meta">
+                Genre: {{ m[2] }} &nbsp;&nbsp; 
+                Actors: {{ m[3] }} &nbsp;&nbsp; 
+                Directors: {{ m[4] }}
+            </div>
+
+            <form action="/predict-box-office" method="POST">
+                <input type="hidden" name="genre" value="{{ m[2] }}">
+                <input type="hidden" name="actor" value="{{ m[3] }}">
+                <input type="hidden" name="director" value="{{ m[4] }}">
+                <input type="hidden" name="release" value="Q3">
+
+                <button type="submit">Predict</button>
+            </form>
+
+            </div>
+        {% endfor %}
+    {% endif %}
 
 </body>
 </html>
