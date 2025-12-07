@@ -59,6 +59,7 @@ use moviebudgetpredictor;
 then, copy the stored procedures from database_schema.sql and paste them on the next line. Make sure to paste them as they are,
 not as a single line. Once you have done that, hit enter, and the stored procedures should be there!  
 
+# Analytics  
 To view where we got the percentages for our calculations, you can visit these links.  
 Domestic ticket prices: https://www.the-numbers.com/market/  
 UK and Ireland ticket prices: https://filmdistributorsassociation.com/the-industry/databank/uk-and-ireland-market-trends/average-ticket-price/  
