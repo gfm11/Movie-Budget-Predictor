@@ -342,6 +342,14 @@ def PredictBoxOffice():
     """, (user_id,))
     movies = cursor.fetchall()
 
+    # change actor to empty if None
+    if(actor == "None"):
+        actor = ""
+
+    # change director to empty if None
+    if(director == "None"):
+        director = ""
+
     # check if the actor is valid
     cursor_actor = db.cursor(buffered=True)
     validActorQuery = "SELECT 1 FROM DirectorsAndActors WHERE member_name=%s AND roll_type='ACTOR'"
