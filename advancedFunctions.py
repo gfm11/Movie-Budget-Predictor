@@ -69,7 +69,7 @@ def calculate_national_box_office(db, genre, actor, director, release):
     print("TICKS PER MOVIE: ", tickets_per_movie)
     print("PROJECTED BOX OFFICE: ", projected_box_office)
 
-    return projected_box_office
+    return f"{projected_box_office:,}"
 
 # calculate projected foreign box office revenue
 def calculate_foreign_box_office(db, genre, actor, director, release):
@@ -137,8 +137,7 @@ def calculate_foreign_box_office(db, genre, actor, director, release):
     print("TICKS PER MOVIE: ", tickets_per_movie)
     print("PROJECTED BOX OFFICE: ", projected_box_office)
 
-    return projected_box_office
-
+    return f"{projected_box_office:,}"
 
 def movie_similarity(new_genre, new_actor, new_director, row):
     score = 0
