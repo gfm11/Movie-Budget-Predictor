@@ -52,7 +52,7 @@ If, while using the website, you encounter an error that says a stored procedure
 input it into mySQL using your terminal. To do so, enter these commands in your terminal:  
 
 sudo mysql  
-use moviebudgetpredictor;  
+use moviebudgetpredictor
 
 then, copy the stored procedures from database_schema.sql and paste them on the next line. Make sure to paste them as they are,
 not as a single line. Once you have done that, hit enter, and the stored procedures should be there!  
