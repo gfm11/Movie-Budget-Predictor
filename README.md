@@ -8,8 +8,6 @@ Flask must be installed to use this application. To install, run pip install fla
 
 You also need pandas to run the program. To install, run pip install flask pandas
 
-If you want to see the website as you are creating it, run python app.py in your terminal, then press ctrl + shift + p and type Simple Browser: Show
-
 # MySQL Connector
 To properly run the database in the app, you need a local version of our database, and mySQL connector.  
 To install mySQL connector and start your mySQL server, run these commands in your terminal:
