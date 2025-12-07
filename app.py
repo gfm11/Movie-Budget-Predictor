@@ -374,11 +374,20 @@ def PredictBoxOffice():
         flash("Predictor error. Invalid director name", "error")
         return render_template('BoxOfficePredictor.html', movies=movies)
 
+    # calculate predicted box offices
+    predictions = advancedFunctions.calculate_box_office(db, genre, actor, director, release)
+
+    # flash error if no matching movies
+    if not predictions or predictions == -1:
+        flash("Predictor error. No data with matching fields exists.", "error")
+        return render_template('BoxOfficePredictor.html', movies=movies)
+
+
     # get results from box office calculations
     print("DB connection:", db.is_connected())
-    domestic_prediction = advancedFunctions.calculate_national_box_office(db, genre, actor, director, release)
+    domestic_prediction = predictions[0]
     print("DOMESTIC: ", domestic_prediction)
-    foreign_prediction = advancedFunctions.calculate_foreign_box_office(db, genre, actor, director, release)
+    foreign_prediction = predictions[1]
     print("FOREIGN: ", foreign_prediction)
 
     # flash error if there are no matched movies

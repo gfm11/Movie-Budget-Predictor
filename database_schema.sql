@@ -82,20 +82,20 @@ create table if not exists UserMovies (
 );
 
 -- making sure this procedure is not already defined before trying to use it
-DROP PROCEDURE IF EXISTS averageDomesticRevenue;
+DROP PROCEDURE IF EXISTS averageRevenue;
 
 -- changing delimiter so ; can be used inside the procedure
 DELIMITER $$
 
--- procedure for retrieving movies for domestic box office predictor advanced function
+-- procedure for retrieving movies for box office predictor advanced function
 -- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
 -- returns average revenue from those movies and count of movies used in the calculation
-CREATE PROCEDURE averageDomesticRevenue(IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255),
+CREATE PROCEDURE averageRevenue(IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255),
                                            IN input_year INT, IN input_quarter_start INT, IN input_quarter_end INT, 
-                                           OUT avg_revenue FLOAT, OUT movie_count FLOAT)
+                                           OUT avg_domestic_revenue FLOAT, OUT movie_count FLOAT, OUT avg_foreign_revenue FLOAT)
 BEGIN
     SELECT IFNULL(AVG(domestic_revenue), 0)
-    INTO avg_revenue
+    INTO avg_domestic_revenue
     FROM (
         SELECT DISTINCT M.title, B.domestic_revenue
         FROM MovieStatistics M
@@ -116,48 +116,10 @@ BEGIN
             OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
             OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
         )
-    ) AS unique_movies;
+    ) AS unique_domestic_movies;
 
-    SELECT IFNULL(COUNT(*), 0)
-    INTO movie_count
-    FROM (
-        SELECT DISTINCT M.title, B.domestic_revenue
-        FROM MovieStatistics M
-        JOIN BoxOffice B ON B.movie_id = M.id
-        LEFT JOIN MembersAndAwards MA_actor 
-            ON MA_actor.movie_id = M.id
-        LEFT JOIN DirectorsAndActors DA_actor 
-            ON DA_actor.member_id = MA_actor.member_id AND DA_actor.roll_type = 'ACTOR'
-        LEFT JOIN MembersAndAwards MA_director 
-            ON MA_director.movie_id = M.id
-        LEFT JOIN DirectorsAndActors DA_director 
-            ON DA_director.member_id = MA_director.member_id AND DA_director.roll_type = 'DIRECTOR'
-        WHERE YEAR(M.release_date) = input_year
-        AND MONTH(M.release_date) BETWEEN input_quarter_start AND input_quarter_end
-        AND (input_genre = '' OR LOWER(M.genres) LIKE LOWER(CONCAT('%', input_genre, '%')))
-        AND (
-            (input_actor = '' AND input_director = '')
-            OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
-            OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
-        )
-    ) AS unique_movies_count;
-END$$
-
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS averageForeignRevenue;
-
--- procedure for retrieving movies for foreign box office predictor advanced function
--- selects revenue from movies with matching genre, actor, or director input, and matching year and quarter input
--- returns average revenue from those movies and count of movies used in the calculation
-DELIMITER $$
-
-CREATE PROCEDURE averageForeignRevenue(IN input_actor VARCHAR(255), IN input_director VARCHAR(255), IN input_genre VARCHAR(255),
-                                           IN input_year INT, IN input_quarter_start INT, IN input_quarter_end INT, 
-                                           OUT avg_revenue FLOAT, OUT movie_count FLOAT)
-BEGIN
     SELECT IFNULL(AVG(worldwide_revenue - domestic_revenue), 0)
-    INTO avg_revenue
+    INTO avg_foreign_revenue
     FROM (
         SELECT DISTINCT M.title, B.worldwide_revenue, B.domestic_revenue
         FROM MovieStatistics M
@@ -178,12 +140,12 @@ BEGIN
             OR (input_actor != '' AND DA_actor.member_name LIKE CONCAT('%', input_actor, '%'))
             OR (input_director != '' AND DA_director.member_name LIKE CONCAT('%', input_director, '%'))
         )
-    ) AS unique_movies;
+    ) AS unique_foreign_movies;
 
     SELECT IFNULL(COUNT(*), 0)
     INTO movie_count
     FROM (
-        SELECT DISTINCT M.title, B.worldwide_revenue, B.domestic_revenue
+        SELECT DISTINCT M.title, B.domestic_revenue
         FROM MovieStatistics M
         JOIN BoxOffice B ON B.movie_id = M.id
         LEFT JOIN MembersAndAwards MA_actor 
